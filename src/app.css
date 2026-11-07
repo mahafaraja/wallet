@@ -286,12 +286,16 @@ body {
   background: color-mix(in srgb, var(--p-accent) 24%, transparent);
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
+/* Keep form defaults below utility classes so button colours and text weights
+   (including the active sidebar state) can be set by design tokens. */
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
 }
 
 input,

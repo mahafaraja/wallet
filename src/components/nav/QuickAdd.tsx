@@ -28,7 +28,7 @@ export function QuickAddFab({ hidden }: { hidden?: boolean }) {
 
   return (
     <>
-      <div className="pointer-events-none fixed bottom-[calc(max(env(safe-area-inset-bottom,0px),10px)+66px)] right-4 z-40 flex flex-col items-end gap-2 lg:bottom-8 lg:right-8">
+      <div className="pointer-events-none fixed bottom-[calc(max(env(safe-area-inset-bottom,0px),10px)+66px)] right-[calc(env(safe-area-inset-right,0px)+1rem)] z-40 flex flex-col items-end gap-2 md:bottom-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] md:right-[calc(env(safe-area-inset-right,0px)+1.5rem)] lg:bottom-8 lg:right-8">
         <div className="pointer-events-auto">
           <button
             type="button"
@@ -36,7 +36,7 @@ export function QuickAddFab({ hidden }: { hidden?: boolean }) {
             aria-label="Add a transaction"
             className={cn(
               "grid h-14 w-14 place-items-center rounded-full bg-accent text-on-accent",
-              "shadow-[var(--shadow-float)] transition active:scale-[0.94] lg:h-13 lg:w-13",
+              "shadow-[var(--shadow-float)] transition active:scale-[0.94] md:h-13 md:w-13",
             )}
           >
             <Plus size={26} strokeWidth={2.6} />

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Home, Receipt, PieChart, Target, BarChart3, Settings } from "lucide-react";
+import { Home, Receipt, PieChart, Target, BarChart3, Settings, Landmark } from "lucide-react";
 import { cn } from "@/components/ui/primitives";
 import { navigate } from "@/state/router";
 import type { RouteName } from "@/state/router";
@@ -14,15 +14,21 @@ export const NAV_ITEMS: NavItem[] = [
   { name: "insights", path: "/insights", label: "Insights", icon: BarChart3 },
 ];
 
+/** Keep a parent destination highlighted while a related detail page is open. */
+function isActiveDestination(destination: RouteName, active: RouteName): boolean {
+  return destination === active || (destination === "goals" && active === "goal");
+}
+
+/** Phones retain the five-destination bottom bar; tablets use the sidebar. */
 export function BottomNav({ active }: { active: RouteName }) {
   return (
     <nav
-      aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/92 backdrop-blur-xl safe-b lg:hidden"
+      aria-label="Main navigation"
+      className="safe-b fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/92 backdrop-blur-xl md:hidden"
     >
-      <ul className="mx-auto flex max-w-lg items-stretch">
+      <ul className="mx-auto flex max-w-lg items-stretch px-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]">
         {NAV_ITEMS.map((item) => {
-          const isActive = item.name === active;
+          const isActive = isActiveDestination(item.name, active);
           return (
             <li key={item.name} className="flex-1">
               <button
@@ -30,7 +36,7 @@ export function BottomNav({ active }: { active: RouteName }) {
                 onClick={() => navigate(item.path)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex w-full flex-col items-center gap-[3px] py-2 transition-colors",
+                  "flex min-h-11 w-full flex-col items-center gap-[3px] py-2 transition-colors",
                   isActive ? "text-accent" : "text-ink-3",
                 )}
               >
@@ -47,24 +53,33 @@ export function BottomNav({ active }: { active: RouteName }) {
   );
 }
 
-/** Same destinations, expressed as a rail once there is room for one. */
+/** A persistent, touch-friendly sidebar for iPad, tablets, and desktop. */
 export function SideNav({ active }: { active: RouteName }) {
+  const accountsActive = active === "accounts" || active === "account";
+  const settingsActive = active === "settings" || active === "categories";
+
   return (
     <nav
-      aria-label="Main"
-      className="fixed left-0 top-0 z-40 hidden h-full w-[228px] flex-col border-r border-line bg-surface px-3 py-5 lg:flex"
+      aria-label="Main navigation"
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 hidden w-52 flex-col overflow-y-auto border-r border-line bg-surface",
+        "pr-3 pl-[max(0.75rem,env(safe-area-inset-left,0px))]",
+        "pt-[max(1.25rem,env(safe-area-inset-top,0px))] pb-[max(1.25rem,env(safe-area-inset-bottom,0px))]",
+        "md:flex lg:w-[228px]",
+      )}
     >
-      <div className="mb-6 flex items-center gap-2.5 px-2">
-        <AppMark />
-        <div className="leading-tight">
-          <p className="ts-subhead-emph">Pocket Ledger</p>
+      <div className="mb-8 flex items-center gap-2.5 px-2">
+        <AppMark size={34} />
+        <div className="min-w-0 leading-tight">
+          <p className="ts-subhead-emph truncate">Pocket Ledger</p>
           <p className="ts-caption-1 text-ink-3">Personal finance</p>
         </div>
       </div>
 
-      <ul className="flex flex-1 flex-col gap-0.5">
+      <p className="eyebrow mb-2 px-2.5 text-ink-3">Explore</p>
+      <ul className="space-y-1">
         {NAV_ITEMS.map((item) => {
-          const isActive = item.name === active;
+          const isActive = isActiveDestination(item.name, active);
           return (
             <li key={item.name}>
               <button
@@ -72,11 +87,11 @@ export function SideNav({ active }: { active: RouteName }) {
                 onClick={() => navigate(item.path)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "ts-subheadline flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 font-medium transition-colors",
+                  "ts-subheadline flex min-h-11 w-full items-center gap-3 rounded-sm px-2.5 py-2 font-medium transition-colors",
                   isActive ? "bg-accent-wash text-accent" : "text-ink-2 hover:bg-surface-2",
                 )}
               >
-                <item.icon size={18} strokeWidth={isActive ? 2.4 : 1.7} />
+                <item.icon size={19} strokeWidth={isActive ? 2.4 : 1.8} aria-hidden />
                 {item.label}
               </button>
             </li>
@@ -84,18 +99,37 @@ export function SideNav({ active }: { active: RouteName }) {
         })}
       </ul>
 
-      <button
-        type="button"
-        onClick={() => navigate("/settings")}
-        aria-current={active === "settings" ? "page" : undefined}
-        className={cn(
-          "flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 ts-subheadline font-medium transition-colors",
-          active === "settings" ? "bg-accent-wash text-accent" : "text-ink-2 hover:bg-surface-2",
-        )}
-      >
-        <Settings size={18} strokeWidth={active === "settings" ? 2.4 : 1.7} />
-        Settings
-      </button>
+      <div className="mt-6 border-t border-line pt-5">
+        <p className="eyebrow mb-2 px-2.5 text-ink-3">Your wallet</p>
+        <button
+          type="button"
+          onClick={() => navigate("/accounts")}
+          aria-current={accountsActive ? "page" : undefined}
+          className={cn(
+            "ts-subheadline flex min-h-11 w-full items-center gap-3 rounded-sm px-2.5 py-2 font-medium transition-colors",
+            accountsActive ? "bg-accent-wash text-accent" : "text-ink-2 hover:bg-surface-2",
+          )}
+        >
+          <Landmark size={19} strokeWidth={accountsActive ? 2.4 : 1.8} aria-hidden />
+          Accounts
+        </button>
+      </div>
+
+      <div className="mt-auto pt-6">
+        <button
+          type="button"
+          onClick={() => navigate("/settings")}
+          aria-current={settingsActive ? "page" : undefined}
+          className={cn(
+            "ts-subheadline flex min-h-11 w-full items-center gap-3 rounded-sm px-2.5 py-2 font-medium transition-colors",
+            settingsActive ? "bg-accent-wash text-accent" : "text-ink-2 hover:bg-surface-2",
+          )}
+        >
+          <Settings size={19} strokeWidth={settingsActive ? 2.4 : 1.8} aria-hidden />
+          Settings
+        </button>
+        <p className="ts-caption-1 mt-2 px-2.5 text-ink-3">Private to this device</p>
+      </div>
     </nav>
   );
 }
@@ -127,11 +161,16 @@ export function AppShell({
   wide?: boolean;
 }) {
   return (
-    <div className="min-h-dvh lg:pl-[228px]">
+    <div className="min-h-dvh md:pl-52 lg:pl-[228px]">
       <SideNav active={active} />
       <BottomNav active={active} />
 
-      <div className={cn("mx-auto w-full px-4 pb-[calc(max(env(safe-area-inset-bottom,0px),12px)+84px)] pt-[max(env(safe-area-inset-top,0px),14px)] lg:px-8 lg:pb-16 lg:pt-8")}>
+      <main
+        className={cn(
+          "mx-auto w-full px-4 pb-[calc(max(env(safe-area-inset-bottom,0px),12px)+84px)] pt-[max(env(safe-area-inset-top,0px),14px)]",
+          "md:px-6 md:pb-[max(4rem,env(safe-area-inset-bottom,0px))] md:pt-[max(2rem,env(safe-area-inset-top,0px))] lg:px-8",
+        )}
+      >
         <div className={cn("mx-auto", wide ? "max-w-4xl" : "max-w-xl lg:max-w-2xl")}>
           <header className="mb-5">
             <div className="flex items-start justify-between gap-3">
@@ -147,7 +186,7 @@ export function AppShell({
 
           <div className="a-rise">{children}</div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -5,7 +5,8 @@ expenses, budgets, accounts and savings goals — no account, no server, no
 analytics.
 
 Built mobile-first as an installable PWA, tuned for the iPhone XR viewport and
-up through desktop.
+up through desktop. Phones use the bottom navigation; from 768px, iPads, tablets
+and desktops get a persistent sidebar with direct access to accounts and settings.
 
 ---
 
