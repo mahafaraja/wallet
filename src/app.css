@@ -1,0 +1,476 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   POCKET LEDGER — DESIGN TOKENS
+   ----------------------------------------------------------------------------
+   Single source of truth for colour, typography, radius, elevation and motion.
+   No component should declare a raw hex value; everything resolves through a
+   --p-* primitive that is redefined per theme.
+
+   Naming: --p-<role>[-<variant>]
+   ============================================================================ */
+
+@theme inline {
+  /* -- Typography ---------------------------------------------------------- */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Segoe UI", Roboto, "Helvetica Neue", Inter, system-ui, sans-serif;
+
+  /* -- Semantic colour ----------------------------------------------------- */
+  --color-bg: var(--p-bg);
+  --color-surface: var(--p-surface);
+  --color-surface-2: var(--p-surface-2);
+  --color-elevated: var(--p-elevated);
+  --color-line: var(--p-line);
+  --color-line-strong: var(--p-line-strong);
+
+  --color-ink: var(--p-ink);
+  --color-ink-2: var(--p-ink-2);
+  --color-ink-3: var(--p-ink-3);
+  --color-on-accent: var(--p-on-accent);
+
+  --color-accent: var(--p-accent);
+  --color-accent-press: var(--p-accent-press);
+  --color-accent-wash: var(--p-accent-wash);
+
+  --color-income: var(--p-income);
+  --color-income-wash: var(--p-income-wash);
+  --color-expense: var(--p-expense);
+  --color-expense-wash: var(--p-expense-wash);
+  --color-warning: var(--p-warning);
+  --color-warning-wash: var(--p-warning-wash);
+  --color-danger: var(--p-danger);
+  --color-danger-wash: var(--p-danger-wash);
+
+  /* Category indicator palette (10 hues, solid + wash) */
+  --color-hue1: var(--p-hue1);
+  --color-hue1-wash: var(--p-hue1-wash);
+  --color-hue2: var(--p-hue2);
+  --color-hue2-wash: var(--p-hue2-wash);
+  --color-hue3: var(--p-hue3);
+  --color-hue3-wash: var(--p-hue3-wash);
+  --color-hue4: var(--p-hue4);
+  --color-hue4-wash: var(--p-hue4-wash);
+  --color-hue5: var(--p-hue5);
+  --color-hue5-wash: var(--p-hue5-wash);
+  --color-hue6: var(--p-hue6);
+  --color-hue6-wash: var(--p-hue6-wash);
+  --color-hue7: var(--p-hue7);
+  --color-hue7-wash: var(--p-hue7-wash);
+  --color-hue8: var(--p-hue8);
+  --color-hue8-wash: var(--p-hue8-wash);
+  --color-hue9: var(--p-hue9);
+  --color-hue9-wash: var(--p-hue9-wash);
+  --color-hue10: var(--p-hue10);
+  --color-hue10-wash: var(--p-hue10-wash);
+
+  /* -- Shape --------------------------------------------------------------- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-sheet: 24px;
+
+  /* -- Elevation ----------------------------------------------------------- */
+  --shadow-card: 0 1px 2px rgb(16 16 29 / 0.04), 0 1px 1px rgb(16 16 29 / 0.02);
+  --shadow-raised: 0 2px 4px rgb(16 16 29 / 0.05), 0 8px 20px -8px rgb(16 16 29 / 0.1);
+  --shadow-sheet: 0 -8px 40px -12px rgb(16 16 29 / 0.22);
+  --shadow-float: 0 6px 22px -6px rgb(16 16 29 / 0.26);
+
+  /* -- Motion -------------------------------------------------------------- */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   LIGHT THEME (default)
+   Restrained cool-neutral base with a single indigo-violet accent.
+   --------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  --p-bg: #f4f4f7;
+  --p-surface: #ffffff;
+  --p-surface-2: #eeeef2;
+  --p-elevated: #ffffff;
+  --p-line: #e3e3e9;
+  --p-line-strong: #d3d3dc;
+
+  --p-ink: #16161d;
+  --p-ink-2: #5c5c69;
+  --p-ink-3: #8e8e9b;
+  --p-on-accent: #ffffff;
+
+  --p-accent: #5653cf;
+  --p-accent-press: #4744b4;
+  --p-accent-wash: #eeeefc;
+
+  --p-income: #0d7a5a;
+  --p-income-wash: #e6f4ef;
+  --p-expense: #a8412f;
+  --p-expense-wash: #fbeeea;
+  --p-warning: #96620a;
+  --p-warning-wash: #fcf2e2;
+  --p-danger: #c2321f;
+  --p-danger-wash: #fceceb;
+
+  --p-hue1: #5653cf;
+  --p-hue2: #0d7a9c;
+  --p-hue3: #0d7a5a;
+  --p-hue4: #8a6411;
+  --p-hue5: #a8412f;
+  --p-hue6: #9c3f7a;
+  --p-hue7: #5c5c69;
+  --p-hue8: #1f6f5c;
+  --p-hue9: #3f5a9c;
+  --p-hue10: #7a5a34;
+
+  --p-hue1-wash: #eeeefc;
+  --p-hue2-wash: #e6f2f7;
+  --p-hue3-wash: #e6f4ef;
+  --p-hue4-wash: #f8f1e3;
+  --p-hue5-wash: #fbeeea;
+  --p-hue6-wash: #f9ecf5;
+  --p-hue7-wash: #eeeef2;
+  --p-hue8-wash: #e7f3f0;
+  --p-hue9-wash: #eaeef7;
+  --p-hue10-wash: #f5efe8;
+}
+
+/* ---------------------------------------------------------------------------
+   DARK THEME
+   Deep near-black base, lifted surfaces, brightened accent for contrast.
+   --------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --p-bg: #08080b;
+  --p-surface: #121217;
+  --p-surface-2: #1b1b22;
+  --p-elevated: #1e1e26;
+  --p-line: #26262f;
+  --p-line-strong: #35354100;
+
+  --p-line-strong: #353541;
+
+  --p-ink: #f4f4f7;
+  --p-ink-2: #a6a6b3;
+  --p-ink-3: #75757f;
+  --p-on-accent: #ffffff;
+
+  --p-accent: #8f8cf5;
+  --p-accent-press: #a3a0f8;
+  --p-accent-wash: #1d1d2e;
+
+  --p-income: #4fd0a4;
+  --p-income-wash: #12241d;
+  --p-expense: #f0937f;
+  --p-expense-wash: #2a1a17;
+  --p-warning: #e0ab52;
+  --p-warning-wash: #2a2113;
+  --p-danger: #f4756a;
+  --p-danger-wash: #2c1614;
+
+  --p-hue1: #8f8cf5;
+  --p-hue2: #55bede;
+  --p-hue3: #4fd0a4;
+  --p-hue4: #dcb45e;
+  --p-hue5: #f0937f;
+  --p-hue6: #e78fc8;
+  --p-hue7: #a6a6b3;
+  --p-hue8: #6ecab6;
+  --p-hue9: #8ea8e0;
+  --p-hue10: #cfa878;
+
+  --p-hue1-wash: #1d1d2e;
+  --p-hue2-wash: #12222a;
+  --p-hue3-wash: #12241d;
+  --p-hue4-wash: #26200f;
+  --p-hue5-wash: #2a1a17;
+  --p-hue6-wash: #291824;
+  --p-hue7-wash: #1b1b22;
+  --p-hue8-wash: #11221e;
+  --p-hue9-wash: #171f2c;
+  --p-hue10-wash: #241c12;
+}
+
+/* ---------------------------------------------------------------------------
+   BASE
+   --------------------------------------------------------------------------- */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--p-bg);
+  color: var(--p-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--p-accent) 24%, transparent);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  /* iOS: prevent zoom-on-focus by never letting computed size drop below 16px */
+  font-size: max(16px, 1em);
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--p-accent) 80%, transparent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove native number spinners — amounts are entered on our own pad */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Native date inputs read poorly in dark mode without this */
+input[type="date"] {
+  color-scheme: inherit;
+}
+
+/* ---------------------------------------------------------------------------
+   TYPOGRAPHY UTILITIES
+   Financial figures are the product. They get their own scale.
+   --------------------------------------------------------------------------- */
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Large balance / hero figure */
+@utility figure-xl {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-size: clamp(34px, 10vw, 44px);
+  line-height: 1.02;
+  font-weight: 650;
+  letter-spacing: -0.032em;
+}
+
+@utility figure-lg {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 620;
+  letter-spacing: -0.022em;
+}
+
+@utility figure-md {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-size: 19px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+
+/* Numeric keypad digits */
+@utility figure-keypad {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+@utility eyebrow {
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 620;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   LAYOUT HELPERS
+   --------------------------------------------------------------------------- */
+
+@utility safe-b {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 10px);
+}
+
+@utility safe-t {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility no-bar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility press {
+  transition:
+    transform 180ms var(--ease-out-quart),
+    background-color 140ms ease,
+    opacity 140ms ease;
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+@utility hairline {
+  box-shadow: inset 0 -1px 0 var(--p-line);
+}
+
+/* ---------------------------------------------------------------------------
+   MOTION
+   --------------------------------------------------------------------------- */
+
+@keyframes pl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pl-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pl-sheet-up {
+  from {
+    transform: translateY(102%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pl-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pl-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pl-shimmer {
+  from {
+    background-position: -220% 0;
+  }
+  to {
+    background-position: 220% 0;
+  }
+}
+
+.a-rise {
+  animation: pl-rise 380ms var(--ease-out-expo) both;
+}
+.a-fade {
+  animation: pl-fade 200ms ease both;
+}
+.a-sheet {
+  animation: pl-sheet-up 340ms var(--ease-out-expo) both;
+}
+.a-pop {
+  animation: pl-pop 220ms var(--ease-out-expo) both;
+}
+.a-toast {
+  animation: pl-toast-in 260ms var(--ease-out-expo) both;
+}
+
+.skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--p-surface-2) 0%,
+    color-mix(in srgb, var(--p-surface-2) 60%, var(--p-surface)) 50%,
+    var(--p-surface-2) 100%
+  );
+  background-size: 220% 100%;
+  animation: pl-shimmer 1.4s linear infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Recharts: keep text on our token colours and cursor subtle */
+.recharts-cartesian-axis-tick text {
+  fill: var(--p-ink-3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.recharts-cartesian-grid line {
+  stroke: var(--p-line);
+}
+.recharts-curve.recharts-tooltip-cursor {
+  stroke: var(--p-line-strong);
+}
+.recharts-default-tooltip {
+  border-radius: 10px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
