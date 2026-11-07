@@ -52,8 +52,8 @@ export function SectionHeader({
   return (
     <div className="mb-2.5 flex items-end justify-between gap-3 px-0.5">
       <div className="min-w-0">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{title}</h2>
-        {hint ? <p className="mt-0.5 text-[12.5px] text-ink-3">{hint}</p> : null}
+        <h2 className="ts-headline">{title}</h2>
+        {hint ? <p className="ts-footnote mt-0.5 text-ink-3">{hint}</p> : null}
       </div>
       {action ? <div className="shrink-0 pb-0.5">{action}</div> : null}
     </div>
@@ -84,9 +84,9 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-[13px]",
-  md: "h-10 px-4 text-[14px]",
-  lg: "h-12 px-5 text-[15px]",
+  sm: "ts-footnote-emph h-8 px-3",
+  md: "ts-subhead-emph h-10 px-4",
+  lg: "ts-callout h-12 px-5 font-semibold",
 };
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -112,24 +112,45 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       )}
       {...rest}
     >
-      {Icon ? <Icon size={size === "sm" ? 15 : 17} strokeWidth={2.1} /> : null}
+      {/*
+        Icon weight tracks the label weight it sits beside. A semibold label
+        next to a regular-weight icon reads as a mistake, and so does the
+        reverse, so the pairing is decided here once.
+      */}
+      {Icon ? (
+        <Icon
+          size={size === "sm" ? 14 : 17}
+          strokeWidth={size === "sm" ? 2.2 : 2.4}
+        />
+      ) : null}
       {children}
     </button>
   );
 });
 
+/**
+ * Square-ish icon-only button.
+ *
+ * `weight` follows the SF Symbols stroke scale, defaulting to medium because an
+ * icon standing alone in a button has no label to lean on and needs the density.
+ * Pass "semibold" for actions the user is about to take, such as close or add.
+ */
 export function IconButton({
   icon: Icon,
   label,
   variant = "secondary",
   size = 36,
+  weight = 2,
   className,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   icon: LucideIcon;
   label: string;
   variant?: ButtonVariant;
+  /** Icon diameter in px. */
   size?: number;
+  /** SF Symbols stroke weight; a raw number matches Lucide's strokeWidth. */
+  weight?: number;
 }) {
   return (
     <button
@@ -146,7 +167,7 @@ export function IconButton({
       style={{ width: size, height: size }}
       {...rest}
     >
-      <Icon size={Math.round(size * 0.5)} strokeWidth={2.1} />
+      <Icon size={Math.round(size * 0.5)} strokeWidth={weight} />
     </button>
   );
 }
@@ -180,20 +201,17 @@ export function Field({
 }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <label
-        htmlFor={htmlFor}
-        className="mb-1.5 block text-[12px] font-semibold text-ink-2"
-      >
+      <label htmlFor={htmlFor} className="ts-caption-1 mb-1.5 block font-semibold text-ink-2">
         {label}
       </label>
       {children}
       {error ? (
-        <p className="mt-1.5 flex items-start gap-1 text-[12.5px] text-danger">
+        <p className="ts-footnote mt-1.5 flex items-start gap-1 text-danger">
           <span aria-hidden>•</span>
           {error}
         </p>
       ) : hint ? (
-        <p className="mt-1.5 text-[12.5px] text-ink-3">{hint}</p>
+        <p className="ts-footnote mt-1.5 text-ink-3">{hint}</p>
       ) : null}
     </div>
   );
@@ -297,7 +315,7 @@ export function Segmented<T extends string>({
             onClick={() => onChange(option.value)}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded-[6px] font-semibold transition-colors",
-              size === "sm" ? "h-8 text-[12.5px]" : "h-9 text-[13.5px]",
+              size === "sm" ? "ts-footnote-emph h-8" : "ts-subhead-emph h-9",
               active ? "bg-surface text-ink shadow-card" : "text-ink-2",
             )}
           >
@@ -342,7 +360,7 @@ export function Chip({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-semibold transition-colors",
+        "ts-footnote-emph inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors",
         active ? "bg-accent text-on-accent" : tone ? toneClass : "bg-surface-2 text-ink-2 border border-line",
         onClick && "active:scale-[0.97]",
         className,
@@ -427,7 +445,7 @@ export function CategoryIndicator({
       className={cn("grid shrink-0 place-items-center rounded-[10px]", `bg-hue${clamped}-wash`, `text-hue${clamped}`, className)}
       style={{ width: size, height: size }}
     >
-      <Icon_ icon={icon} size={Math.round(size * 0.55)} strokeWidth={2.05} />
+      <Icon_ icon={icon} size={Math.round(size * 0.55)} strokeWidth={2} />
     </span>
   );
 }
@@ -461,10 +479,10 @@ export function StatTile({
     <div className="rounded-md bg-surface-2 px-3 py-2.5">
       <div className="flex items-center gap-1.5">
         {Icon ? <Icon size={13} strokeWidth={2.2} className="text-ink-3" /> : null}
-        <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</p>
+        <p className="eyebrow text-ink-3">{label}</p>
       </div>
       <p className={cn("figure-md tnum mt-1", toneText)}>{value}</p>
-      {sub ? <p className="mt-0.5 text-[11.5px] text-ink-3">{sub}</p> : null}
+      {sub ? <p className="ts-caption-1 mt-0.5 text-ink-3">{sub}</p> : null}
     </div>
   );
 }
@@ -511,7 +529,7 @@ export function SearchField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         enterKeyHint="search"
-        className="w-full rounded-sm border border-line bg-surface-2 py-2.5 pl-9 pr-9 text-[16px] text-ink placeholder:text-ink-3 focus:border-accent focus:bg-surface focus:outline-none"
+        className="ts-callout w-full rounded-sm border border-line bg-surface-2 py-2.5 pl-9 pr-9 text-ink placeholder:text-ink-3 focus:border-accent focus:bg-surface focus:outline-none"
       />
       {value ? (
         <button
@@ -552,7 +570,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+        "ts-caption-2 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-semibold",
         tones[tone],
         className,
       )}
@@ -591,7 +609,7 @@ export function ListRow({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={cn(
-        "relative flex w-full items-center gap-3 px-3.5 py-3 text-left",
+        "ts-body relative flex w-full items-center gap-3 px-3.5 py-3 text-left",
         indent && "hairline last:shadow-none",
         onClick && "transition-colors active:bg-surface-2",
         className,
