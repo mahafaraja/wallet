@@ -49,9 +49,68 @@ Type is a native system font stack (`-apple-system` first). Financial figures
 use tabular numerals throughout so digits never jitter as totals change, and the
 largest figures get their own scale with tight display tracking.
 
+### Typography
+
+Type resolves through a font stack that is licensed correctly at every step:
+
+1. `-apple-system`, `BlinkMacSystemFont` — the genuine **San Francisco** on every
+   iPhone, iPad, Mac and Apple TV. Zero bytes downloaded.
+2. `"SF Pro Local"` — an opt-in `@font-face` with `local()` sources. The `url()`
+   is commented out until a use case clears Apple's licence; adding a file and
+   uncommenting one line is the whole change.
+3. `"Inter Variable"` — the closest open-licensed match (SIL OFL-1.1), with
+   `cv02`/`cv03`/`cv04`/`cv11` enabled to pull the letterforms toward SF: tailed
+   `l`, single-storey `a`, alternate `4`/`6`/`9`.
+
+Text uses the iOS text-style ramp, transcribed from Apple's Human Interface
+Guidelines — size and line-height in px, tracking converted from Apple's point
+values:
+
+| Class | Size / leading | Tracking | Weight | Used for |
+| --- | --- | --- | --- | --- |
+| `ts-large-title` | 34 / 41 | +0.011em | 400 | Screen title |
+| `ts-title-1` | 28 / 34 | +0.013em | 400 | Page heading |
+| `ts-title-2` | 22 / 28 | +0.016em | 400 | Card heading |
+| `ts-title-3` | 20 / 25 | +0.019em | 400 | Sheet title |
+| `ts-headline` | 17 / 22 | −0.024em | 600 | List row primary |
+| `ts-body` | 17 / 22 | −0.024em | 400 | Body copy |
+| `ts-callout` | 16 / 21 | −0.020em | 400 | Secondary body |
+| `ts-subheadline` | 15 / 20 | −0.016em | 400 | Row secondary |
+| `ts-footnote` | 13 / 18 | −0.006em | 400 | Captions, metadata |
+| `ts-caption-1` | 12 / 16 | 0 | 400 | Helper text |
+| `ts-caption-2` | 11 / 13 | +0.005em | 400 | Badges, tab labels |
+
+Money has its own scale (`.figure-xl` / `-lg` / `-md`) with tighter display
+tracking than text at the same size, and tabular numerals everywhere so digits
+never jitter as totals change.
+
+The only intentional non-token sizes are the 16px input minimum, which stops iOS
+zooming on focus, and the Recharts tick size.
+
+### Icons
+
 Icons are **Lucide React only** — no emoji, no generated art, no hand-drawn SVG
-illustrations. `src/design/icons.ts` maps stored icon *names* to components so
+illustrations. `src/design/icons.tsx` maps stored icon *names* to components so
 records stay JSON-serialisable.
+
+Because SF Symbols cannot be shipped to the web, `src/design/Icon.tsx` maps
+their two defining behaviours onto Lucide, which is drawn on the same 24px grid
+with round caps and joins:
+
+**Stroke weights** (the real SF Symbols scale):
+
+| | | | | | | |
+|---|---|---|---|---|---|---|
+| Ultralight | Thin | Light | Regular | Medium | Semibold | Bold |
+| 1 | 1.25 | 1.5 | 1.7 | 2 | 2.4 | 2.8 |
+
+**Point sizes:** 11, 13, 15, 17, 20, 24, 28.
+
+Weight tracks the weight of the text beside it. `regular` for static inline
+symbols and list rows; `medium` where an icon must hold its own (navigation,
+tinted tiles); `semibold` for actions the user is about to take; `bold` reserved
+for a screen's single primary action. Pairing a semibold label with a
+regular-weight icon reads as a mistake, and so does the reverse.
 
 The application mark is a simple geometric target: a ring and a dot, legible at
 16px.
