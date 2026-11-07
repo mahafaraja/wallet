@@ -66,10 +66,10 @@ export function Sheet({
       >
         <header className="flex items-start gap-3 px-4 pb-3 pt-4">
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-[17px] font-semibold tracking-[-0.015em]">{title}</h2>
-            {subtitle ? <p className="mt-0.5 text-[12.5px] text-ink-3">{subtitle}</p> : null}
+            <h2 className="ts-headline truncate">{title}</h2>
+            {subtitle ? <p className="ts-footnote mt-0.5 text-ink-3">{subtitle}</p> : null}
           </div>
-          <IconButton icon={X} label="Close" variant="secondary" size={30} onClick={onClose} />
+          <IconButton icon={X} label="Close" variant="secondary" size={30} weight={2.4} onClick={onClose} />
         </header>
 
         <div className="no-bar min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
@@ -131,15 +131,15 @@ export function ConfirmDialog({
         aria-labelledby="confirm-title"
         className="a-pop relative z-10 w-full max-w-sm rounded-lg border border-line bg-elevated p-5 shadow-[var(--shadow-float)]"
       >
-        <h3 id="confirm-title" className="text-[17px] font-semibold tracking-[-0.015em]">
+        <h3 id="confirm-title" className="ts-headline">
           {title}
         </h3>
-        <div className="mt-2 text-[13.5px] leading-relaxed text-ink-2">{body}</div>
+        <div className="ts-footnote mt-2 leading-relaxed text-ink-2">{body}</div>
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={onCancel}
-            className="h-10 rounded-md border border-line bg-surface px-4 text-[14px] font-semibold text-ink transition active:scale-[0.97]"
+            className="ts-subhead-emph h-10 rounded-md border border-line bg-surface px-4 text-ink transition active:scale-[0.97]"
           >
             {cancelLabel}
           </button>
@@ -148,7 +148,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={busy}
             className={cn(
-              "h-10 rounded-md px-4 text-[14px] font-semibold transition active:scale-[0.97] disabled:opacity-50",
+              "ts-subhead-emph h-10 rounded-md px-4 transition active:scale-[0.97] disabled:opacity-50",
               destructive ? "bg-danger text-white" : "bg-accent text-on-accent",
             )}
           >

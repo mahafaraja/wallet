@@ -53,7 +53,7 @@ export function TransactionRow({
             `text-hue${category.hue}`,
           )}
         >
-          <CatIcon size={17} strokeWidth={2.05} />
+          <CatIcon size={17} strokeWidth={2} />
         </span>
       ) : (
         <span
@@ -63,15 +63,15 @@ export function TransactionRow({
             isTransfer ? "bg-surface-2 text-ink-2" : isIncome ? "bg-income-wash text-income" : "bg-expense-wash text-expense",
           )}
         >
-          <Icon size={17} strokeWidth={2.15} />
+          <Icon size={17} strokeWidth={2.2} />
         </span>
       )}
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[15px] font-medium leading-tight text-ink">
+        <span className="ts-subheadline block truncate font-medium leading-tight text-ink">
           {transaction.description}
         </span>
-        <span className="mt-0.5 block truncate text-[12.5px] text-ink-3">
+        <span className="ts-footnote mt-0.5 block truncate text-ink-3">
           {showDate ? `${dayLabel(transaction.date)} · ` : ""}
           {secondary}
         </span>
@@ -85,7 +85,7 @@ export function TransactionRow({
           tone={isIncome ? "income" : isTransfer ? "muted" : "neutral"}
         />
         {transaction.baseAmountMinor !== undefined && transaction.currency !== transaction.baseCurrency ? (
-          <span className="mt-0.5 block text-[10.5px] text-ink-3">
+          <span className="mt-0.5 block ts-caption-2 text-ink-3">
             ≈ <Money amountMinor={transaction.baseAmountMinor} currency={transaction.baseCurrency!} size="sm" tone="muted" />
           </span>
         ) : null}
@@ -108,7 +108,7 @@ export function TransactionGroup({
   return (
     <section>
       <div className="mb-1.5 flex items-baseline justify-between px-1">
-        <h3 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</h3>
+        <h3 className="eyebrow text-ink-3">{label}</h3>
         {trailing}
       </div>
       <div className="overflow-hidden rounded-lg border border-line bg-surface">{children}</div>

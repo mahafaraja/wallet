@@ -34,8 +34,8 @@ export function BottomNav({ active }: { active: RouteName }) {
                   isActive ? "text-accent" : "text-ink-3",
                 )}
               >
-                <item.icon size={22} strokeWidth={isActive ? 2.3 : 1.85} />
-                <span className={cn("text-[10px]", isActive ? "font-semibold" : "font-medium")}>
+                <item.icon size={22} strokeWidth={isActive ? 2.4 : 1.7} />
+                <span className={cn("ts-caption-2", isActive ? "font-semibold" : "font-medium")}>
                   {item.label}
                 </span>
               </button>
@@ -57,8 +57,8 @@ export function SideNav({ active }: { active: RouteName }) {
       <div className="mb-6 flex items-center gap-2.5 px-2">
         <AppMark />
         <div className="leading-tight">
-          <p className="text-[14px] font-semibold tracking-[-0.01em]">Pocket Ledger</p>
-          <p className="text-[11px] text-ink-3">Personal finance</p>
+          <p className="ts-subhead-emph">Pocket Ledger</p>
+          <p className="ts-caption-1 text-ink-3">Personal finance</p>
         </div>
       </div>
 
@@ -72,11 +72,11 @@ export function SideNav({ active }: { active: RouteName }) {
                 onClick={() => navigate(item.path)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-[14px] font-medium transition-colors",
+                  "ts-subheadline flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 font-medium transition-colors",
                   isActive ? "bg-accent-wash text-accent" : "text-ink-2 hover:bg-surface-2",
                 )}
               >
-                <item.icon size={18} strokeWidth={isActive ? 2.25 : 1.9} />
+                <item.icon size={18} strokeWidth={isActive ? 2.4 : 1.7} />
                 {item.label}
               </button>
             </li>
@@ -89,11 +89,11 @@ export function SideNav({ active }: { active: RouteName }) {
         onClick={() => navigate("/settings")}
         aria-current={active === "settings" ? "page" : undefined}
         className={cn(
-          "flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-[14px] font-medium transition-colors",
+          "flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 ts-subheadline font-medium transition-colors",
           active === "settings" ? "bg-accent-wash text-accent" : "text-ink-2 hover:bg-surface-2",
         )}
       >
-        <Settings size={18} strokeWidth={1.9} />
+        <Settings size={18} strokeWidth={active === "settings" ? 2.4 : 1.7} />
         Settings
       </button>
     </nav>
@@ -136,9 +136,9 @@ export function AppShell({
           <header className="mb-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h1 className="text-[28px] font-bold leading-tight tracking-[-0.028em]">{title}</h1>
+                <h1 className="ts-title-1 font-bold">{title}</h1>
                 {subtitle ? (
-                  <div className="mt-1 text-[13.5px] text-ink-2">{subtitle}</div>
+                  <div className="ts-footnote mt-1 text-ink-2">{subtitle}</div>
                 ) : null}
               </div>
               {headerRight ? <div className="flex shrink-0 items-center gap-2 pt-1.5">{headerRight}</div> : null}

@@ -136,7 +136,7 @@ export function SettingsScreen({
                   { value: "system", label: "System", icon: MonitorSmartphone },
                 ]}
               />
-              <p className="mt-2.5 text-[12.5px] text-ink-3">
+              <p className="mt-2.5 ts-footnote text-ink-3">
                 System follows your device, including a change while the app is open.
               </p>
             </Card>
@@ -170,7 +170,7 @@ export function SettingsScreen({
               </Field>
 
               <div className="mt-4">
-                <p className="mb-2 text-[12px] font-semibold text-ink-2">Available when recording</p>
+                <p className="mb-2 ts-caption-1 font-semibold text-ink-2">Available when recording</p>
                 <div className="flex flex-wrap gap-1.5">
                   {CATALOGUE_ORDER.map((code) => {
                     const active = enabledCurrencies.includes(code);
@@ -183,7 +183,7 @@ export function SettingsScreen({
                         disabled={locked}
                         aria-pressed={active}
                         className={cn(
-                          "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition",
+                          "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ts-footnote-emph transition",
                           active
                             ? "border-accent bg-accent-wash text-accent"
                             : "border-line bg-surface-2 text-ink-2",
@@ -197,17 +197,17 @@ export function SettingsScreen({
                     );
                   })}
                 </div>
-                <p className="mt-2 text-[12px] text-ink-3">
+                <p className="mt-2 ts-caption-1 text-ink-3">
                   Enabling a currency only makes it available in pickers. Nothing is converted until you enter a rate.
                 </p>
               </div>
 
               {ratePairs.length > 0 ? (
                 <div className="mt-4 border-t border-line pt-4">
-                  <p className="mb-1 text-[12px] font-semibold text-ink-2">
+                  <p className="mb-1 ts-caption-1 font-semibold text-ink-2">
                     Rates into {reportingCurrency}
                   </p>
-                  <p className="mb-2.5 text-[12px] text-ink-3">
+                  <p className="mb-2.5 ts-caption-1 text-ink-3">
                     You supply these by hand. A record in another currency is excluded from reports until you give it a
                     rate — never estimated.
                   </p>
@@ -218,7 +218,7 @@ export function SettingsScreen({
                       return (
                         <div key={pair.key} className="flex items-end gap-2.5">
                           <div className="min-w-0 flex-1">
-                            <label className="mb-1 block text-[11.5px] text-ink-3">
+                            <label className="mb-1 block ts-caption-1 text-ink-3">
                               1 {pair.from} ({meta.symbol}) in {pair.to}
                             </label>
                             <Input
@@ -239,7 +239,7 @@ export function SettingsScreen({
                             />
                           </div>
                           {value ? (
-                            <span className="pb-2.5 text-[11.5px] text-ink-3">
+                            <span className="pb-2.5 ts-caption-1 text-ink-3">
                               ≈ {formatMoney(1, pair.from)} = {Number(value).toLocaleString()} {pair.to}
                             </span>
                           ) : null}
@@ -266,11 +266,11 @@ export function SettingsScreen({
                 }
               })()}>
                 <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-2">
-                  <Download size={17} strokeWidth={2.05} />
+                  <Download size={17} strokeWidth={2} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-medium">Export JSON backup</span>
-                  <span className="block text-[12px] text-ink-3">
+                  <span className="block ts-subheadline font-medium">Export JSON backup</span>
+                  <span className="block ts-caption-1 text-ink-3">
                     {counts.transactions} transactions · {counts.accounts} accounts · {counts.goals} goals
                   </span>
                 </span>
@@ -278,11 +278,11 @@ export function SettingsScreen({
 
               <ListRow onClick={() => fileRef.current?.click()}>
                 <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-2">
-                  <Upload size={17} strokeWidth={2.05} />
+                  <Upload size={17} strokeWidth={2} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-medium">Restore from backup</span>
-                  <span className="block text-[12px] text-ink-3">
+                  <span className="block ts-subheadline font-medium">Restore from backup</span>
+                  <span className="block ts-caption-1 text-ink-3">
                     Conflicts are detected before anything is written
                   </span>
                 </span>
@@ -308,20 +308,20 @@ export function SettingsScreen({
             <Card className="!p-3.5">
               <div className="flex items-start gap-3">
                 <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-3">
-                  <CloudOff size={17} strokeWidth={2.05} />
+                  <CloudOff size={17} strokeWidth={2} />
                 </span>
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 text-[14.5px] font-semibold">
+                  <p className="flex items-center gap-2 ts-callout font-semibold">
                     Google Drive
-                    <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10.5px] font-semibold text-ink-3">
+                    <span className="rounded-full bg-surface-2 px-2 py-0.5 ts-caption-2 font-semibold text-ink-3">
                       Not connected
                     </span>
                   </p>
-                  <p className="mt-1 text-[12.5px] leading-snug text-ink-3">{sync.cloud.detail}</p>
+                  <p className="mt-1 ts-footnote leading-snug text-ink-3">{sync.cloud.detail}</p>
                 </div>
               </div>
 
-              <div className="mt-3.5 space-y-2 rounded-sm bg-surface-2 px-3 py-3 text-[12px] text-ink-2">
+              <div className="mt-3.5 space-y-2 rounded-sm bg-surface-2 px-3 py-3 ts-caption-1 text-ink-2">
                 <p className="flex items-start gap-2">
                   <Cloud size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
                   Backups will live in a visible Drive folder named{" "}
@@ -349,7 +349,7 @@ export function SettingsScreen({
               >
                 Connect Google Drive
               </Button>
-              <p id="cloud-disabled" className="mt-1.5 text-center text-[11.5px] text-ink-3">
+              <p id="cloud-disabled" className="mt-1.5 text-center ts-caption-1 text-ink-3">
                 Switched on in a later version. Not part of this build.
               </p>
             </Card>
@@ -366,13 +366,13 @@ export function SettingsScreen({
                 }}
               >
                 <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-2">
-                  <RefreshCw size={17} strokeWidth={2.05} />
+                  <RefreshCw size={17} strokeWidth={2} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-medium">
+                  <span className="block ts-subheadline font-medium">
                     {isDemoData ? "Reset sample data" : "Load sample data"}
                   </span>
-                  <span className="block text-[12px] text-ink-3">
+                  <span className="block ts-caption-1 text-ink-3">
                     {isDemoData
                       ? "Removes demo records and reseeds them."
                       : "Adds clearly labelled example records. Existing data is left alone."}
@@ -382,11 +382,11 @@ export function SettingsScreen({
 
               <ListRow onClick={() => setConfirmWipe(true)}>
                 <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-danger-wash text-danger">
-                  <Trash2 size={17} strokeWidth={2.05} />
+                  <Trash2 size={17} strokeWidth={2} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-medium text-danger">Delete all data</span>
-                  <span className="block text-[12px] text-ink-3">
+                  <span className="block ts-subheadline font-medium text-danger">Delete all data</span>
+                  <span className="block ts-caption-1 text-ink-3">
                     Clears every account, transaction, budget and goal on this device.
                   </span>
                 </span>
@@ -399,8 +399,8 @@ export function SettingsScreen({
             <SectionHeader title="About" />
             <Card className="!p-3.5">
               <div className="flex items-start gap-2.5">
-                <Info size={15} strokeWidth={2.05} className="mt-0.5 shrink-0 text-ink-3" />
-                <p className="text-[12.5px] leading-relaxed text-ink-2">
+                <Info size={15} strokeWidth={2} className="mt-0.5 shrink-0 text-ink-3" />
+                <p className="ts-footnote leading-relaxed text-ink-2">
                   Pocket Ledger stores everything in your browser's IndexedDB on this device. No account, no server, no
                   analytics. Backups are plain JSON you can open in any text editor.
                 </p>
@@ -515,7 +515,7 @@ export function SettingsScreen({
         <div className="fixed inset-x-0 bottom-0 z-[80] flex justify-center px-4 pb-[calc(max(env(safe-area-inset-bottom,0px),10px)+84px)]">
           <div className="flex items-center gap-2 rounded-full border border-line bg-elevated px-3.5 py-2 shadow-[var(--shadow-float)]">
             <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-line border-t-accent" />
-            <span className="text-[12.5px] font-medium">{busy}…</span>
+            <span className="ts-footnote-emph">{busy}…</span>
           </div>
         </div>
       ) : null}
@@ -526,8 +526,8 @@ export function SettingsScreen({
 function Count({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-md bg-surface-2 px-3 py-2">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</p>
-      <p className="tnum mt-0.5 text-[15px] font-semibold">{value}</p>
+      <p className="eyebrow text-ink-3">{label}</p>
+      <p className="tnum mt-0.5 ts-subhead-emph">{value}</p>
     </div>
   );
 }

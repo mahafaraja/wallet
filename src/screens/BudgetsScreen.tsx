@@ -104,7 +104,7 @@ export function BudgetsScreen({
             <button
               type="button"
               onClick={() => setMonth(currentMonthKey())}
-              className="text-[14.5px] font-semibold tracking-[-0.01em]"
+              className="ts-callout font-semibold tracking-[-0.01em]"
             >
               {monthLabel(month)}
             </button>
@@ -135,7 +135,7 @@ export function BudgetsScreen({
               <Card>
                 <div className="flex items-baseline justify-between">
                   <p className="eyebrow text-ink-3">Total allocated</p>
-                  <span className="tnum text-[12px] font-semibold text-ink-3">{usedPct}% used</span>
+                  <span className="tnum ts-caption-1 font-semibold text-ink-3">{usedPct}% used</span>
                 </div>
                 <p className="figure-lg tnum mt-1">
                   <Money amountMinor={allocated} currency={reportingCurrency} size="lg" />
@@ -147,7 +147,7 @@ export function BudgetsScreen({
                     tone={usedPct >= 100 ? "expense" : usedPct >= 85 ? "warning" : "accent"}
                   />
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px]">
+                <div className="ts-footnote mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
                   <span className="text-ink-2">
                     Spent <Money amountMinor={spent} currency={reportingCurrency} size="sm" tone="muted" />
                   </span>
@@ -188,13 +188,13 @@ export function BudgetsScreen({
                             `text-hue${p.category?.hue ?? 7}`,
                           )}
                         >
-                          <Icon size={17} strokeWidth={2.05} />
+                          <Icon size={17} strokeWidth={2} />
                         </span>
 
                         <span className="min-w-0 flex-1">
                           <span className="flex items-baseline justify-between gap-2">
-                            <span className="truncate text-[15px] font-medium">{p.category?.name ?? "Uncategorised"}</span>
-                            <span className="tnum shrink-0 text-[13px] font-semibold">
+                            <span className="truncate ts-subheadline font-medium">{p.category?.name ?? "Uncategorised"}</span>
+                            <span className="tnum shrink-0 ts-footnote font-semibold">
                               {formatMoney(p.spentMinor, reportingCurrency)}
                               <span className="font-normal text-ink-3"> / {formatMoney(p.allocatedMinor, reportingCurrency)}</span>
                             </span>
@@ -206,7 +206,7 @@ export function BudgetsScreen({
 
                           <span
                             className={cn(
-                              "tnum mt-1 block text-[11.5px]",
+                              "tnum mt-1 block ts-caption-1",
                               p.status === "over" ? "text-expense" : p.status === "near" ? "text-warning" : "text-ink-3",
                             )}
                           >
@@ -217,7 +217,7 @@ export function BudgetsScreen({
                           </span>
 
                           {p.status !== "ok" && p.status !== "over" ? (
-                            <span className="mt-1 block text-[11.5px] text-ink-3">
+                            <span className="mt-1 block ts-caption-1 text-ink-3">
                               {p.dailyAllowanceMinor > 0
                                 ? `Spend about ${formatMoney(p.dailyAllowanceMinor, reportingCurrency)} a day to land on target.`
                                 : "Nothing left to spend in this category."}
@@ -232,8 +232,8 @@ export function BudgetsScreen({
 
               {/* How thresholds work */}
               <div className="flex items-start gap-2.5 rounded-md bg-surface-2 px-3.5 py-3">
-                <Info size={15} strokeWidth={2.05} className="mt-px shrink-0 text-ink-3" />
-                <p className="text-[12.5px] leading-snug text-ink-2">
+                <Info size={15} strokeWidth={2} className="mt-px shrink-0 text-ink-3" />
+                <p className="ts-footnote leading-snug text-ink-2">
                   Bars shift from accent to amber at 85% and to red only once a cap is exceeded. Transfers never count
                   towards any budget.
                 </p>
@@ -264,15 +264,15 @@ export function BudgetsScreen({
                           `text-hue${category.hue}`,
                         )}
                       >
-                        <Icon size={17} strokeWidth={2.05} />
+                        <Icon size={17} strokeWidth={2} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] font-medium">{category.name}</span>
-                        <span className="block text-[12px] text-ink-3">
+                        <span className="block truncate ts-subheadline font-medium">{category.name}</span>
+                        <span className="block ts-caption-1 text-ink-3">
                           <Money amountMinor={spent} currency={reportingCurrency} size="sm" tone="muted" /> spent this month
                         </span>
                       </span>
-                      <Plus size={17} strokeWidth={2.3} className="shrink-0 text-accent" />
+                      <Plus size={17} strokeWidth={2.4} className="shrink-0 text-accent" />
                     </ListRow>
                   );
                 })}
@@ -426,7 +426,7 @@ function BudgetSheet({
               key={preset}
               type="button"
               onClick={() => setAmountText(String(preset / 10 ** decimals))}
-              className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[12.5px] font-semibold text-ink-2"
+              className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1.5 ts-footnote-emph text-ink-2"
             >
               {formatMoney(preset, currency)}
             </button>
@@ -435,8 +435,8 @@ function BudgetSheet({
 
         {existing ? (
           <div className="flex items-start gap-2.5 rounded-sm bg-surface-2 px-3 py-2.5">
-            <AlertTriangle size={15} strokeWidth={2.05} className="mt-px shrink-0 text-ink-3" />
-            <p className="text-[12.5px] leading-snug text-ink-2">
+            <AlertTriangle size={15} strokeWidth={2} className="mt-px shrink-0 text-ink-3" />
+            <p className="ts-footnote leading-snug text-ink-2">
               Changing this cap applies from {monthLabel(existing.startsOn)} onwards. Past months are not recalculated.
             </p>
           </div>

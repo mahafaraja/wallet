@@ -105,7 +105,7 @@ export function GoalsScreen({
                     tone="income"
                   />
                 </div>
-                <p className="mt-2 text-[12.5px] text-ink-3">
+                <p className="ts-footnote mt-2 text-ink-3">
                   {totalTarget > 0 ? (
                     <>
                       <Money amountMinor={totalTarget - totalSaved} currency={goals[0]?.currency ?? reportingCurrency} size="sm" tone="muted" />{" "}
@@ -138,22 +138,22 @@ export function GoalsScreen({
                               `text-hue${p.goal.hue}`,
                             )}
                           >
-                            <Icon size={19} strokeWidth={2.05} />
+                            <Icon size={19} strokeWidth={2} />
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-start justify-between gap-2">
-                              <p className="min-w-0 truncate text-[15.5px] font-semibold">{p.goal.name}</p>
+                              <p className="min-w-0 truncate ts-subhead-emph">{p.goal.name}</p>
                               {p.isComplete ? (
-                                <span className="shrink-0 rounded-full bg-income-wash px-2 py-0.5 text-[10.5px] font-semibold text-income">
+                                <span className="shrink-0 rounded-full bg-income-wash px-2 py-0.5 ts-caption-2 font-semibold text-income">
                                   Funded
                                 </span>
                               ) : (
-                                <span className="tnum shrink-0 text-[12.5px] font-semibold text-ink-2">
+                                <span className="tnum shrink-0 ts-footnote-emph text-ink-2">
                                   {p.progressPercent}%
                                 </span>
                               )}
                             </div>
-                            <p className="mt-0.5 text-[12px] text-ink-3">
+                            <p className="mt-0.5 ts-caption-1 text-ink-3">
                               <Money amountMinor={p.savedMinor} currency={p.goal.currency} size="sm" tone="muted" /> of{" "}
                               <Money amountMinor={p.goal.targetAmountMinor} currency={p.goal.currency} size="sm" tone="muted" />
                             </p>
@@ -164,7 +164,7 @@ export function GoalsScreen({
                           <ProgressBar value={p.progressPercent} height={6} tone="income" />
                         </div>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-ink-3">
+                        <div className="ts-caption-1 mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-3">
                           {p.monthsRemaining !== null ? (
                             <span className="inline-flex items-center gap-1">
                               <CalendarDays size={12} strokeWidth={2.1} />
@@ -367,7 +367,7 @@ function GoalEditorSheet({
               key={preset}
               type="button"
               onClick={() => setTargetText(String(preset / 10 ** decimals))}
-              className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[12.5px] font-semibold text-ink-2"
+              className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1.5 ts-footnote-emph text-ink-2"
             >
               {formatMoney(preset, currency)}
             </button>
@@ -395,7 +395,7 @@ function GoalEditorSheet({
                     active ? "border-accent bg-accent-wash text-accent" : "border-line bg-surface-2 text-ink-2",
                   )}
                 >
-                  <Icon size={17} strokeWidth={2.05} />
+                  <Icon size={17} strokeWidth={2} />
                 </button>
               );
             })}
@@ -527,7 +527,7 @@ export function FundingSheet({
               key={preset}
               type="button"
               onClick={() => setAmountText(String(preset / 10 ** decimals))}
-              className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[12.5px] font-semibold text-ink-2"
+              className="shrink-0 rounded-full border border-line bg-surface-2 px-3 py-1.5 ts-footnote-emph text-ink-2"
             >
               {formatMoney(preset, goal.currency)}
             </button>
@@ -550,7 +550,7 @@ export function FundingSheet({
           </Field>
         ) : (
           <div className="rounded-sm bg-surface-2 px-3 py-2.5">
-            <p className="text-[12.5px] text-ink-2">
+            <p className="ts-footnote text-ink-2">
               No {goal.currency} account exists, so this will only adjust the goal total.
             </p>
           </div>
@@ -615,14 +615,14 @@ export function GoalDetailScreen({
                   `text-hue${goal.hue}`,
                 )}
               >
-                <Icon size={22} strokeWidth={2.05} />
+                <Icon size={22} strokeWidth={2} />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="eyebrow text-ink-3">Saved</p>
                 <p className="figure-lg tnum mt-0.5">
                   <Money amountMinor={progress.savedMinor} currency={goal.currency} size="lg" />
                 </p>
-                <p className="mt-1 text-[12.5px] text-ink-3">
+                <p className="mt-1 ts-footnote text-ink-3">
                   of {formatMoney(goal.targetAmountMinor, goal.currency)}
                   {progress.remainingMinor > 0 ? ` · ${formatMoney(progress.remainingMinor, goal.currency)} to go` : " · funded"}
                 </p>
@@ -644,7 +644,7 @@ export function GoalDetailScreen({
             </div>
 
             {goal.description ? (
-              <p className="mt-3 rounded-sm bg-surface-2 px-3 py-2.5 text-[13px] leading-relaxed text-ink-2">
+              <p className="mt-3 rounded-sm bg-surface-2 px-3 py-2.5 ts-footnote leading-relaxed text-ink-2">
                 {goal.description}
               </p>
             ) : null}
@@ -676,13 +676,13 @@ export function GoalDetailScreen({
                           positive ? "bg-income-wash text-income" : "bg-surface-2 text-ink-2",
                         )}
                       >
-                        {positive ? <Plus size={17} strokeWidth={2.3} /> : <Minus size={17} strokeWidth={2.3} />}
+                        {positive ? <Plus size={17} strokeWidth={2.4} /> : <Minus size={17} strokeWidth={2.4} />}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[14.5px] font-medium">
+                        <span className="block truncate ts-callout font-medium">
                           {c.note ?? (positive ? "Contribution" : "Withdrawal")}
                         </span>
-                        <span className="block text-[12px] text-ink-3">
+                        <span className="block ts-caption-1 text-ink-3">
                           {dayLabel(c.date)}
                           {c.transactionId && accountName(c.transactionId) ? " · linked" : ""}
                         </span>
@@ -716,8 +716,8 @@ export function GoalDetailScreen({
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md bg-surface-2 px-3 py-2">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</p>
-      <p className="tnum mt-0.5 text-[14px] font-semibold">{value}</p>
+      <p className="eyebrow text-ink-3">{label}</p>
+      <p className="ts-subhead-emph tnum mt-0.5">{value}</p>
     </div>
   );
 }

@@ -153,7 +153,7 @@ export function ActivityScreen({
             <button
               type="button"
               onClick={() => setMonth(currentMonthKey())}
-              className="text-[14.5px] font-semibold tracking-[-0.01em]"
+              className="ts-callout font-semibold tracking-[-0.01em]"
             >
               {monthLabel(month)}
             </button>
@@ -188,7 +188,7 @@ export function ActivityScreen({
                   setQuery("");
                   setRange({ from: "", to: "" });
                 }}
-                className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-[12.5px] font-semibold text-ink-2"
+                className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 ts-footnote-emph text-ink-2"
               >
                 <X size={12} strokeWidth={2.6} /> Clear
               </button>
@@ -223,7 +223,7 @@ export function ActivityScreen({
           </div>
 
           {totals.skippedForeignCount > 0 ? (
-            <p className="px-1 text-[12px] text-ink-3">
+            <p className="px-1 ts-caption-1 text-ink-3">
               {totals.skippedForeignCount} {totals.skippedForeignCount === 1 ? "record is" : "records are"} in another
               currency and excluded from these totals.
             </p>
@@ -271,10 +271,10 @@ export function ActivityScreen({
                 return (
                   <section key={group.label}>
                     <div className="mb-1.5 flex items-baseline justify-between px-1">
-                      <h3 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-ink-3">
+                      <h3 className="eyebrow text-ink-3">
                         {group.label}
                       </h3>
-                      <span className="tnum text-[12px] font-medium text-ink-3">
+                      <span className="tnum ts-caption-1 font-medium text-ink-3">
                         {group.rows.some((t) => t.type !== "transfer")
                           ? formatMoney(dayNet, group.rows[0].currency)
                           : "Transfers only"}
@@ -445,7 +445,7 @@ function MiniStat({
     <div className="rounded-md bg-surface-2 px-3 py-2.5">
       <div className="flex items-center gap-1.5">
         <Icon size={13} strokeWidth={2.2} className="text-ink-3" />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</p>
+        <p className="eyebrow text-ink-3">{label}</p>
       </div>
       <p className="mt-1">{value}</p>
     </div>
@@ -462,7 +462,7 @@ function DeleteAffordance({ transaction, onDelete }: { transaction: Transaction;
     <div className="mt-3">
       {armed ? (
         <div className="flex items-center gap-2 rounded-sm bg-danger-wash px-3 py-2.5">
-          <p className="flex-1 text-[12.5px] text-danger">Delete this record permanently?</p>
+          <p className="flex-1 ts-footnote text-danger">Delete this record permanently?</p>
           <Button size="sm" variant="danger" onClick={onDelete}>
             Delete
           </Button>
@@ -473,8 +473,8 @@ function DeleteAffordance({ transaction, onDelete }: { transaction: Transaction;
       ) : (
         <div className="flex items-center justify-between rounded-sm border border-line px-3 py-2">
           <div className="min-w-0">
-            <p className="truncate text-[12.5px] font-medium text-ink-2">{transaction.description}</p>
-            <p className="text-[11.5px] text-ink-3">
+            <p className="truncate ts-footnote-emph text-ink-2">{transaction.description}</p>
+            <p className="ts-caption-1 text-ink-3">
               Recorded {dayLabel(transaction.date)}
             </p>
           </div>

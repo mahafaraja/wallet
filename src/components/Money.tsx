@@ -39,8 +39,8 @@ type MoneyProps = {
 };
 
 const SIZE_CLASS: Record<NonNullable<MoneyProps["size"]>, string> = {
-  sm: "text-[13px] font-semibold",
-  md: "text-[15px] font-semibold",
+  sm: "ts-footnote-emph",
+  md: "ts-subhead-emph",
   lg: "figure-lg",
   xl: "figure-xl",
 };
@@ -61,7 +61,7 @@ export function Money({ amountMinor, currency, className, signed, size = "md", t
       <span className={cn("tnum inline-flex items-center gap-1", SIZE_CLASS[size], TONE_CLASS[tone], className)}>
         {signed ? <span aria-hidden>±</span> : null}
         <span aria-hidden>{MASK}</span>
-        <EyeOff size={size === "xl" ? 15 : 11} strokeWidth={2.2} className="opacity-45" />
+        <EyeOff size={size === "xl" ? 17 : 13} strokeWidth={2} className="opacity-45" />
         <span className="sr-only">Amount hidden</span>
       </span>
     );
@@ -100,7 +100,7 @@ export function moneyText(amountMinor: Minor, currency: string, signed?: boolean
 export function CurrencyLabel({ code }: { code: string }) {
   return (
     <span className="inline-flex items-baseline gap-1">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-3">{code}</span>
+      <span className="eyebrow text-ink-3">{code}</span>
     </span>
   );
 }

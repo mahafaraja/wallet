@@ -73,8 +73,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <Info size={17} strokeWidth={2.2} className="mt-px shrink-0 text-accent" />
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-[13.5px] font-semibold leading-snug">{t.message}</p>
-              {t.detail ? <p className="mt-0.5 text-[12px] text-ink-2">{t.detail}</p> : null}
+              <p className="ts-footnote-emph leading-snug">{t.message}</p>
+              {t.detail ? <p className="ts-caption-1 mt-0.5 text-ink-2">{t.detail}</p> : null}
             </div>
             <button
               type="button"
@@ -124,8 +124,8 @@ export function EmptyState({
       <span className="grid h-11 w-11 place-items-center rounded-full bg-surface-2 text-ink-3">
         <Icon size={20} strokeWidth={1.9} />
       </span>
-      <p className="mt-3 text-[14.5px] font-semibold text-ink">{title}</p>
-      {body ? <p className="mt-1 max-w-[34ch] text-[13px] leading-relaxed text-ink-3">{body}</p> : null}
+      <p className="ts-callout mt-3 font-semibold text-ink">{title}</p>
+      {body ? <p className="ts-footnote mt-1 max-w-[34ch] leading-relaxed text-ink-3">{body}</p> : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );
@@ -155,7 +155,7 @@ export function InlineLoading({ label }: { label?: string }) {
   return (
     <div className="flex items-center justify-center gap-2 py-6 text-ink-3" role="status">
       <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-line border-t-accent" />
-      {label ? <span className="text-[13px]">{label}</span> : <span className="sr-only">Loading</span>}
+      {label ? <span className="ts-footnote">{label}</span> : <span className="sr-only">Loading</span>}
     </div>
   );
 }

@@ -59,9 +59,9 @@ function TooltipCard({
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-sm border border-line bg-elevated px-2.5 py-2 shadow-[var(--shadow-card)]">
-      <p className="mb-1 text-[11px] font-semibold text-ink-3">{label}</p>
+      <p className="mb-1 ts-caption-2 font-semibold text-ink-3">{label}</p>
       {payload.map((entry) => (
-        <p key={String(entry.name)} className="flex items-center gap-1.5 text-[12.5px]">
+        <p key={String(entry.name)} className="flex items-center gap-1.5 ts-footnote">
           <span className="h-2 w-2 rounded-full" style={{ background: entry.color }} />
           <span className="text-ink-2">{entry.name}</span>
           <span className="tnum ml-auto font-semibold text-ink">
@@ -185,10 +185,10 @@ export function InsightsScreen({
                 savingsRate !== null ? (
                   <>
                     <span className="tnum text-[19px] font-semibold">{savingsRate}%</span>
-                    <span className="mt-0.5 block text-[11.5px] text-ink-3">of income</span>
+                    <span className="mt-0.5 block ts-caption-1 text-ink-3">of income</span>
                   </>
                 ) : (
-                  <span className="text-[15px] text-ink-3">No income yet</span>
+                  <span className="ts-subheadline text-ink-3">No income yet</span>
                 )
               }
             />
@@ -196,8 +196,8 @@ export function InsightsScreen({
 
           {totals.skippedForeignCount > 0 ? (
             <div className="flex items-start gap-2.5 rounded-md border border-line bg-surface px-3.5 py-3">
-              <Info size={15} strokeWidth={2.05} className="mt-px shrink-0 text-ink-3" />
-              <p className="text-[12.5px] leading-snug text-ink-2">
+              <Info size={15} strokeWidth={2} className="mt-px shrink-0 text-ink-3" />
+              <p className="ts-footnote leading-snug text-ink-2">
                 {totals.skippedForeignCount}{" "}
                 {totals.skippedForeignCount === 1 ? "record is" : "records are"} in another currency without a rate and
                 {totals.skippedForeignCount === 1 ? " is" : " are"} excluded from every chart on this screen.
@@ -327,12 +327,12 @@ export function InsightsScreen({
                               `text-hue${meta?.hue ?? 7}`,
                             )}
                           >
-                            <Icon size={14} strokeWidth={2.15} />
+                            <Icon size={14} strokeWidth={2.2} />
                           </span>
                           <span className="min-w-0 flex-1">
                             <span className="flex items-baseline justify-between gap-2">
-                              <span className="truncate text-[13.5px] font-medium">{meta?.name ?? "Other"}</span>
-                              <span className="tnum shrink-0 text-[12.5px] font-semibold">
+                              <span className="truncate ts-footnote font-medium">{meta?.name ?? "Other"}</span>
+                              <span className="tnum shrink-0 ts-footnote-emph">
                                 {formatMoney(slice.totalMinor, reportingCurrency)}
                               </span>
                             </span>
@@ -345,7 +345,7 @@ export function InsightsScreen({
                               />
                             </span>
                           </span>
-                          <span className="tnum w-9 shrink-0 text-right text-[11.5px] text-ink-3">{slice.share}%</span>
+                          <span className="tnum w-9 shrink-0 text-right ts-caption-1 text-ink-3">{slice.share}%</span>
                           <span aria-hidden className="w-2 shrink-0 rounded-full" style={{ background: HUES[i % HUES.length], height: 8 }} />
                         </li>
                       );
@@ -425,14 +425,14 @@ export function InsightsScreen({
                           <Icon size={16} strokeWidth={2.1} />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[13.5px] font-semibold">{p.goal.name}</p>
-                          <p className="text-[11.5px] text-ink-3">{p.progressPercent}% funded</p>
+                          <p className="truncate ts-footnote-emph">{p.goal.name}</p>
+                          <p className="ts-caption-1 text-ink-3">{p.progressPercent}% funded</p>
                         </div>
                       </div>
                       <div className="mt-2.5">
                         <ProgressBar value={p.progressPercent} height={5} tone="income" />
                       </div>
-                      <p className="mt-1.5 text-[11.5px] text-ink-3">
+                      <p className="mt-1.5 ts-caption-1 text-ink-3">
                         <Money amountMinor={p.savedMinor} currency={p.goal.currency} size="sm" tone="muted" /> of{" "}
                         <Money amountMinor={p.goal.targetAmountMinor} currency={p.goal.currency} size="sm" tone="muted" />
                       </p>
@@ -463,21 +463,21 @@ function Headline({
   const improved = hasChange ? (invert ? change < 0 : change > 0) : false;
   return (
     <div className="rounded-md bg-surface-2 px-3 py-2.5">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</p>
+      <p className="eyebrow text-ink-3">{label}</p>
       <p className="mt-1">{value}</p>
       {hasChange ? (
         <p
           className={cn(
-            "mt-1 inline-flex items-center gap-1 text-[11.5px] font-medium",
+            "mt-1 inline-flex items-center gap-1 ts-caption-1 font-medium",
             improved ? "text-income" : change === 0 ? "text-ink-3" : "text-expense",
           )}
         >
-          {change > 0 ? <TrendingUp size={12} strokeWidth={2.3} /> : <TrendingDown size={12} strokeWidth={2.3} />}
+          {change > 0 ? <TrendingUp size={12} strokeWidth={2.4} /> : <TrendingDown size={12} strokeWidth={2.4} />}
           {change > 0 ? "+" : ""}
           {change}% vs last month
         </p>
       ) : (
-        <p className="mt-1 text-[11.5px] text-ink-3">No comparison yet</p>
+        <p className="mt-1 ts-caption-1 text-ink-3">No comparison yet</p>
       )}
     </div>
   );

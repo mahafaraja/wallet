@@ -124,9 +124,7 @@ export function HomeScreen({
             <div className="px-4 pt-4 pb-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="eyebrow text-ink-3">
-                    Available · {reportingCurrency}
-                  </p>
+                  <p className="eyebrow text-ink-3">Available · {reportingCurrency}</p>
                   <div className="mt-1.5">
                     <Money
                       amountMinor={total.totalMinor}
@@ -135,7 +133,7 @@ export function HomeScreen({
                       tone={total.totalMinor < 0 ? "expense" : "neutral"}
                     />
                   </div>
-                  <p className="mt-2 text-[12.5px] text-ink-3">
+                  <p className="mt-2 ts-footnote text-ink-3">
                     {total.includedCount > 0
                       ? `Across ${total.includedCount} ${total.includedCount === 1 ? "account" : "accounts"}`
                       : "No accounts yet"}
@@ -150,7 +148,7 @@ export function HomeScreen({
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-2 text-ink-2 transition active:scale-[0.94]"
                   aria-label={hidden ? "Show amounts" : "Hide amounts"}
                 >
-                  {hidden ? <EyeOff size={17} strokeWidth={2.05} /> : <Eye size={17} strokeWidth={2.05} />}
+                  {hidden ? <EyeOff size={17} strokeWidth={2} /> : <Eye size={17} strokeWidth={2} />}
                 </button>
               </div>
             </div>
@@ -176,8 +174,8 @@ export function HomeScreen({
           {/* ---- Foreign currency note ------------------------------------ */}
           {totals.skippedForeignCount > 0 ? (
             <div className="flex items-start gap-2.5 rounded-md border border-line bg-surface px-3.5 py-3">
-              <Landmark size={16} strokeWidth={2.05} className="mt-px shrink-0 text-ink-3" />
-              <p className="text-[12.5px] leading-snug text-ink-2">
+              <Landmark size={16} strokeWidth={2} className="mt-px shrink-0 text-ink-3" />
+              <p className="ts-footnote leading-snug text-ink-2">
                 {totals.skippedForeignCount}{" "}
                 {totals.skippedForeignCount === 1 ? "transaction is" : "transactions are"} in another currency without a
                 rate, so {totals.skippedForeignCount === 1 ? "it is" : "they are"} left out of these totals. Add a rate on
@@ -240,8 +238,8 @@ export function HomeScreen({
                       <AccountGlyph type={account.type} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14.5px] font-medium">{account.name}</span>
-                      <span className="block text-[11.5px] text-ink-3">{account.currency}</span>
+                      <span className="block truncate ts-callout font-medium">{account.name}</span>
+                      <span className="block ts-caption-1 text-ink-3">{account.currency}</span>
                     </span>
                     <Money amountMinor={balanceMinor} currency={account.currency} size="md" tone={balanceMinor < 0 ? "expense" : "neutral"} />
                   </button>
@@ -276,10 +274,10 @@ export function HomeScreen({
             ) : (
               <Card padded={false} className="!p-3.5">
                 <div className="mb-3 flex items-baseline justify-between">
-                  <p className="text-[13px] font-semibold text-ink-2">
+                  <p className="ts-footnote font-semibold text-ink-2">
                     {formatMoney(budgetSpent, reportingCurrency)} of {formatMoney(budgetAllocated, reportingCurrency)}
                   </p>
-                  <span className="tnum text-[12.5px] text-ink-3">{budgetUsedPct}% used</span>
+                  <span className="tnum ts-footnote text-ink-3">{budgetUsedPct}% used</span>
                 </div>
                 <ProgressBar
                   value={budgetUsedPct}
@@ -290,13 +288,13 @@ export function HomeScreen({
                   {budgetsPerf.slice(0, 3).map((b) => (
                     <div key={b.budget.id}>
                       <div className="mb-1 flex items-baseline justify-between gap-2">
-                        <span className="flex min-w-0 items-center gap-1.5 text-[13px] font-medium text-ink">
+                        <span className="flex min-w-0 items-center gap-1.5 ts-footnote font-medium text-ink">
                           <span aria-hidden>{iconFor(b.category?.icon) && <CategoryGlyph name={b.category?.icon} />}</span>
                           <span className="truncate">{b.category?.name ?? "Uncategorised"}</span>
                         </span>
                         <span
                           className={cn(
-                            "tnum shrink-0 text-[12px] font-semibold",
+                            "tnum shrink-0 ts-caption-1 font-semibold",
                             b.status === "over" ? "text-expense" : b.status === "near" ? "text-warning" : "text-ink-3",
                           )}
                         >
@@ -327,11 +325,11 @@ export function HomeScreen({
                       aria-hidden
                       className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-2"
                     >
-                      <CalendarClock size={17} strokeWidth={2.05} />
+                      <CalendarClock size={17} strokeWidth={2} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14.5px] font-medium">{r.label}</span>
-                      <span className="block text-[12px] text-ink-3">{dayLabel(r.nextDate)}</span>
+                      <span className="block truncate ts-callout font-medium">{r.label}</span>
+                      <span className="block ts-caption-1 text-ink-3">{dayLabel(r.nextDate)}</span>
                     </span>
                     <Money
                       amountMinor={r.amountMinor}
@@ -411,15 +409,15 @@ export function HomeScreen({
                           <CategoryGlyph name={g.icon} />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[14px] font-semibold">{g.name}</span>
-                          <span className="block text-[11.5px] text-ink-3">{pct}% funded</span>
+                          <span className="block truncate ts-subhead-emph">{g.name}</span>
+                          <span className="block ts-caption-1 text-ink-3">{pct}% funded</span>
                         </span>
                         <ArrowRight size={15} strokeWidth={2.1} className="shrink-0 text-ink-3" />
                       </div>
                       <div className="mt-2.5">
                         <ProgressBar value={pct} height={5} tone="income" />
                       </div>
-                      <p className="mt-1.5 text-[11.5px] text-ink-3">
+                      <p className="mt-1.5 ts-caption-1 text-ink-3">
                         <Money amountMinor={saved} currency={g.currency} size="sm" tone="muted" /> of{" "}
                         <Money amountMinor={g.targetAmountMinor} currency={g.currency} size="sm" tone="muted" />
                       </p>
@@ -437,7 +435,7 @@ export function HomeScreen({
               ) : (
                 <TrendingUp size={16} strokeWidth={2.1} className="shrink-0 text-income" />
               )}
-              <p className="text-[12.5px] text-ink-2">
+              <p className="ts-footnote text-ink-2">
                 You {spendChange > 0 ? "spent" : "cut back"}{" "}
                 <strong className="font-semibold text-ink">{Math.abs(spendChange)}%</strong>{" "}
                 {spendChange > 0 ? "more" : "less"} than {monthLabel(shiftMonth(month, -1), "short")}.
@@ -461,7 +459,7 @@ export function HomeScreen({
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="px-2 py-2.5 text-center">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-ink-3">{label}</p>
+      <p className="eyebrow text-ink-3">{label}</p>
       <p className="mt-1">{value}</p>
     </div>
   );
@@ -489,8 +487,8 @@ function QuickAction({
           : "border-line bg-surface text-ink-2",
       )}
     >
-      <Icon size={18} strokeWidth={2.15} />
-      <span className="text-[11.5px] font-semibold">{label}</span>
+      <Icon size={18} strokeWidth={2.2} />
+      <span className="ts-caption-1 font-semibold">{label}</span>
     </button>
   );
 }
@@ -500,7 +498,7 @@ function TextLink({ children, onClick }: { children: React.ReactNode; onClick: (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-0.5 text-[13px] font-semibold text-accent transition active:opacity-60"
+      className="inline-flex items-center gap-0.5 ts-footnote font-semibold text-accent transition active:opacity-60"
     >
       {children}
       <ArrowRight size={13} strokeWidth={2.4} />
@@ -510,7 +508,7 @@ function TextLink({ children, onClick }: { children: React.ReactNode; onClick: (
 
 function CategoryGlyph({ name }: { name?: string }) {
   const Icon = iconFor(name);
-  return <Icon size={15} strokeWidth={2.15} />;
+  return <Icon size={15} strokeWidth={2.2} />;
 }
 
 function AccountGlyph({ type }: { type: Account["type"] }) {
@@ -522,6 +520,6 @@ function AccountGlyph({ type }: { type: Account["type"] }) {
     other: Wallet,
   };
   const Icon = map[type] ?? Wallet;
-  return <Icon size={17} strokeWidth={2.05} />;
+  return <Icon size={17} strokeWidth={2} />;
 }
 

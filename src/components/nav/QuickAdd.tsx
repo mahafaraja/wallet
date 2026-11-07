@@ -39,7 +39,7 @@ export function QuickAddFab({ hidden }: { hidden?: boolean }) {
               "shadow-[var(--shadow-float)] transition active:scale-[0.94] lg:h-13 lg:w-13",
             )}
           >
-            <Plus size={26} strokeWidth={2.4} />
+            <Plus size={26} strokeWidth={2.6} />
           </button>
         </div>
       </div>
@@ -64,16 +64,16 @@ export function QuickAddPair({ onExpense, onIncome }: { onExpense: () => void; o
       <button
         type="button"
         onClick={onExpense}
-        className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-line bg-surface text-[13.5px] font-semibold text-ink transition active:scale-[0.97]"
+        className="ts-subhead-emph flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-line bg-surface text-ink transition active:scale-[0.97]"
       >
-        <ArrowUpFromLine size={16} strokeWidth={2.2} /> Expense
+        <ArrowUpFromLine size={17} strokeWidth={2.4} /> Expense
       </button>
       <button
         type="button"
         onClick={onIncome}
-        className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-line bg-surface text-[13.5px] font-semibold text-ink transition active:scale-[0.97]"
+        className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-line bg-surface ts-footnote-emph text-ink transition active:scale-[0.97]"
       >
-        <ArrowDownToLine size={16} strokeWidth={2.2} /> Income
+        <ArrowDownToLine size={17} strokeWidth={2.4} /> Income
       </button>
     </div>
   );

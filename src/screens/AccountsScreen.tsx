@@ -36,7 +36,7 @@ const TYPE_OPTIONS: { value: AccountType; label: string; icon: typeof Wallet }[]
 function TypeGlyph({ type }: { type: AccountType }) {
   const found = TYPE_OPTIONS.find((t) => t.value === type);
   const Icon = found?.icon ?? CreditCard;
-  return <Icon size={17} strokeWidth={2.05} />;
+  return <Icon size={17} strokeWidth={2} />;
 }
 
 export function AccountsScreen({
@@ -131,14 +131,14 @@ export function AccountsScreen({
                       <p className="eyebrow text-ink-3">
                         {code === reportingCurrency ? "Total · reporting currency" : `Total · ${code}`}
                       </p>
-                      <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10.5px] font-semibold text-ink-2">
+                      <span className="rounded-full bg-surface-2 px-2 py-0.5 ts-caption-2 font-semibold text-ink-2">
                         {code}
                       </span>
                     </div>
                     <p className="figure-lg tnum mt-1">
                       <Money amountMinor={amount} currency={code} size="lg" tone={amount < 0 ? "expense" : "neutral"} />
                     </p>
-                    <p className="mt-1 text-[11.5px] text-ink-3">
+                    <p className="ts-caption-1 mt-1 text-ink-3">
                       {balances.filter((b) => b.account.currency === code).length}{" "}
                       {balances.filter((b) => b.account.currency === code).length === 1 ? "account" : "accounts"}
                     </p>
@@ -147,7 +147,7 @@ export function AccountsScreen({
               </div>
 
               {primary.excludedCount > 0 ? (
-                <p className="px-1 text-[12px] text-ink-3">
+                <p className="px-1 ts-caption-1 text-ink-3">
                   {primary.excludedCount} {primary.excludedCount === 1 ? "account is" : "accounts are"} held in another
                   currency. Totals are shown per currency and never converted automatically.
                 </p>
@@ -167,21 +167,21 @@ export function AccountsScreen({
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-1.5">
-                          <span className="truncate text-[15px] font-medium">{account.name}</span>
+                          <span className="truncate ts-subheadline font-medium">{account.name}</span>
                           {account.archived ? (
-                            <span className="shrink-0 rounded-full bg-surface-2 px-1.5 py-0.5 text-[10px] font-semibold text-ink-3">
+                            <span className="shrink-0 rounded-full bg-surface-2 px-1.5 py-0.5 ts-caption-2 font-semibold text-ink-3">
                               Archived
                             </span>
                           ) : null}
                         </span>
-                        <span className="mt-0.5 block truncate text-[12px] text-ink-3">
+                        <span className="mt-0.5 block truncate ts-caption-1 text-ink-3">
                           {TYPE_OPTIONS.find((t) => t.value === account.type)?.label} ·{" "}
                           {transactionCount} {transactionCount === 1 ? "record" : "records"}
                         </span>
                       </span>
                       <span className="shrink-0 text-right">
                         <Money amountMinor={balanceMinor} currency={account.currency} size="md" tone={balanceMinor < 0 ? "expense" : "neutral"} />
-                        <span className="mt-0.5 block text-[10.5px] text-ink-3">{account.currency}</span>
+                        <span className="mt-0.5 block ts-caption-2 text-ink-3">{account.currency}</span>
                       </span>
                     </ListRow>
                   ))}
@@ -366,8 +366,8 @@ function AccountSheet({
                     active ? "border-accent bg-accent-wash text-accent" : "border-line bg-surface-2 text-ink-2",
                   )}
                 >
-                  <option.icon size={18} strokeWidth={2.05} />
-                  <span className="text-[11.5px] font-medium">{option.label}</span>
+                  <option.icon size={18} strokeWidth={2} />
+                  <span className="ts-caption-1 font-medium">{option.label}</span>
                 </button>
               );
             })}
@@ -479,7 +479,7 @@ export function AccountDetailScreen({
             <p className="figure-xl tnum mt-1">
               <Money amountMinor={balance.balanceMinor} currency={account.currency} size="xl" />
             </p>
-            <p className="mt-2 text-[12.5px] text-ink-3">
+            <p className="ts-footnote mt-2 text-ink-3">
               From an opening balance of {formatMoney(account.openingBalanceMinor, account.currency)} plus{" "}
               {balance.transactionCount} {balance.transactionCount === 1 ? "record" : "records"} — always recalculated,
               never stored.
@@ -487,13 +487,13 @@ export function AccountDetailScreen({
 
             <div className="mt-3.5 grid grid-cols-2 gap-2">
               <div className="rounded-md bg-surface-2 px-3 py-2">
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-ink-3">In</p>
+                <p className="eyebrow text-ink-3">In</p>
                 <p className="mt-0.5">
                   <Money amountMinor={inflow} currency={account.currency} size="md" tone="income" />
                 </p>
               </div>
               <div className="rounded-md bg-surface-2 px-3 py-2">
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.05em] text-ink-3">Out</p>
+                <p className="eyebrow text-ink-3">Out</p>
                 <p className="mt-0.5">
                   <Money amountMinor={outflow} currency={account.currency} size="md" />
                 </p>
@@ -501,7 +501,7 @@ export function AccountDetailScreen({
             </div>
 
             {account.description ? (
-              <p className="mt-3 rounded-sm bg-surface-2 px-3 py-2.5 text-[13px] leading-relaxed text-ink-2">
+              <p className="mt-3 rounded-sm bg-surface-2 px-3 py-2.5 ts-footnote leading-relaxed text-ink-2">
                 {account.description}
               </p>
             ) : null}

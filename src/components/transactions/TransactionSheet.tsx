@@ -51,7 +51,7 @@ function Keypad({ onDigit, onBack, onClear }: { onDigit: (d: string) => void; on
         <button
           type="button"
           onClick={onClear}
-          className="h-[52px] rounded-md bg-surface-2 text-[12px] font-semibold text-ink-2 transition active:scale-[0.96]"
+          className="h-[52px] rounded-md bg-surface-2 ts-caption-1 font-semibold text-ink-2 transition active:scale-[0.96]"
         >
           Clear
         </button>
@@ -238,7 +238,7 @@ export function TransactionSheet({
                 }}
                 aria-pressed={active}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-1.5 rounded-[6px] h-9 text-[13px] font-semibold transition-colors",
+                  "flex flex-1 items-center justify-center gap-1.5 rounded-[6px] h-9 ts-footnote font-semibold transition-colors",
                   active ? "bg-surface text-ink shadow-card" : "text-ink-2",
                 )}
               >
@@ -253,7 +253,7 @@ export function TransactionSheet({
         <div className="rounded-md border border-line bg-surface-2 px-4 py-4">
           <div className="flex items-center justify-between">
             <p className="eyebrow text-ink-3">{activeType.label} amount</p>
-            <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold text-ink-2">
+            <span className="rounded-full bg-surface px-2 py-0.5 ts-caption-2 font-semibold text-ink-2">
               {currency}
             </span>
           </div>
@@ -286,7 +286,7 @@ export function TransactionSheet({
           {needsRate ? (
             <div className="mt-3 rounded-sm bg-surface p-2.5">
               <div className="flex items-center justify-between gap-2">
-                <label htmlFor="rate" className="text-[11.5px] font-semibold text-ink-2">
+                <label htmlFor="rate" className="ts-caption-1 font-semibold text-ink-2">
                   Rate · 1 {currency} =
                 </label>
                 <input
@@ -299,10 +299,10 @@ export function TransactionSheet({
                     setErrors((prev) => ({ ...prev, rate: "" }));
                   }}
                   placeholder="0.0000"
-                  className="tnum w-[110px] rounded-[6px] border border-line bg-surface-2 px-2 py-1 text-right text-[14px] outline-none focus:border-accent"
+                  className="tnum w-[110px] rounded-[6px] border border-line bg-surface-2 px-2 py-1 text-right ts-subheadline outline-none focus:border-accent"
                 />
               </div>
-              <p className="mt-1.5 text-[11.5px] leading-snug text-ink-3">
+              <p className="mt-1.5 ts-caption-1 leading-snug text-ink-3">
                 {convertedMinor !== null ? (
                   <>
                     Counts as <strong className="font-semibold text-ink-2">{formatMoney(convertedMinor, reportingCurrency)}</strong> in{" "}
@@ -403,7 +403,7 @@ export function TransactionSheet({
         {type === "transfer" ? (
           <div className="flex items-start gap-2 rounded-sm bg-accent-wash px-3 py-2.5">
             <ArrowLeftRight size={15} strokeWidth={2.1} className="mt-px shrink-0 text-accent" />
-            <p className="text-[12.5px] leading-snug text-ink-2">
+            <p className="ts-footnote leading-snug text-ink-2">
               Transfers move money between your accounts. They are never counted as income or spending, so your
               reports stay honest.
             </p>
@@ -440,7 +440,7 @@ export function TransactionSheet({
                     </span>
                     <span
                       className={cn(
-                        "w-full truncate text-center text-[10.5px] font-medium",
+                        "w-full truncate text-center ts-caption-2 font-medium",
                         active ? "text-accent" : "text-ink-2",
                       )}
                     >
@@ -469,7 +469,7 @@ export function TransactionSheet({
               {account ? (
                 <Money amountMinor={account.openingBalanceMinor} currency={account.currency} tone="muted" />
               ) : (
-                <span className="text-[13px] text-ink-3">—</span>
+                <span className="ts-footnote text-ink-3">—</span>
               )}
             </div>
           </Field>
