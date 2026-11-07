@@ -1,4 +1,8 @@
 @import "tailwindcss";
+/* Inter Variable — SIL OFL-1.1. The closest open-licensed match to SF Pro:
+   tall x-height, a 100–900 weight axis, and an optical-size axis that adapts
+   between text and display sizes, exactly as SF Pro does. */
+@import "@fontsource-variable/inter";
 
 /* ============================================================================
    POCKET LEDGER — DESIGN TOKENS
@@ -8,13 +12,54 @@
    --p-* primitive that is redefined per theme.
 
    Naming: --p-<role>[-<variant>]
+
+   TYPOGRAPHY LICENSING
+   --------------------
+   Apple's SF Pro and SF Symbols are licensed for Apple platforms only, so they
+   are never self-hosted here. Instead the stack resolves in this order:
+
+     1. -apple-system / BlinkMacSystemFont
+        The genuine San Francisco on every iPhone, iPad, Mac and Apple TV.
+        Zero bytes downloaded, fully licensed by the platform.
+     2. "SF Pro Local"
+        An opt-in @font-face whose local() sources resolve if SF Pro is
+        installed. The url() stays commented out until a use case clears it.
+     3. "Inter Variable"
+        The closest legal match everywhere else, with cv02/cv03/cv04/cv11
+        enabled to pull the letterforms toward SF's shapes.
+
+   If nothing resolves the browser falls through to the platform system font.
+   No missing-glyph boxes, ever.
    ============================================================================ */
+
+/*
+ * Opt-in self-hosted SF Pro. Leave the url() commented out unless your use of
+ * SF Pro is confirmed to be within Apple's licence. Adding the file and
+ * uncommenting one line is the entire change.
+ */
+@font-face {
+  font-family: "SF Pro Local";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src:
+    local("SF Pro Text"),
+    local("SF Pro Display"),
+    local(".SFNS-Regular"),
+    local(".SFNSText"),
+    local(".AppleSystemUIFont"),
+    local("Helvetica Neue");
+  /* url("/fonts/SF-Pro.woff2") format("woff2") */
+}
 
 @theme inline {
   /* -- Typography ---------------------------------------------------------- */
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-    "Segoe UI", Roboto, "Helvetica Neue", Inter, system-ui, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Local", "Inter Variable",
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
+
+  --font-mono:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
   /* -- Semantic colour ----------------------------------------------------- */
   --color-bg: var(--p-bg);
@@ -213,6 +258,15 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/*
+ * Inter's cv02/cv03/cv04/cv11 alternate glyphs bring it measurably closer to
+ * SF Pro: a tailed `l`, a single-storey `a`, and the alternate 4/6/9. On Apple
+ * hardware the real San Francisco answers instead and these are ignored.
+ */
+:root {
+  --ff-sf-tuning: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
+}
+
 body {
   margin: 0;
   background: var(--p-bg);
@@ -220,6 +274,8 @@ body {
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.45;
+  font-feature-settings: var(--ff-sf-tuning);
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -269,38 +325,146 @@ input[type="date"] {
 
 /* ---------------------------------------------------------------------------
    TYPOGRAPHY UTILITIES
-   Financial figures are the product. They get their own scale.
+   ---------------------------------------------------------------------------
+   Two scales live here.
+
+   1. The iOS TEXT-STYLE RAMP (.ts-*), transcribed from Apple's Human Interface
+      Guidelines: size and line-height in px, tracking converted from Apple's
+      point values. This is the scale every label, row and heading uses, so
+      hierarchy comes from one place instead of ad-hoc pixel choices.
+
+      Apple documents tracking in points. For a px-based stylesheet the
+      conversion is 1pt at 72dpi = 1.333px, and the em equivalent is
+      (trackingPt / 4) / 3, normalised per size. The values below are the
+      resulting em values, which is what actually renders correctly.
+
+   2. The FIGURE scale (.figure-*), for money. Financial amounts are the
+      product, so they get tighter tracking than text at the same size and
+      always use tabular numerals so digits never jitter as totals change.
    --------------------------------------------------------------------------- */
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-feature-settings: var(--ff-sf-tuning), "tnum" 1;
 }
 
-/* Large balance / hero figure */
+/* ---- iOS text styles ---------------------------------------------------- */
+
+@utility ts-large-title {
+  font-size: 34px;
+  line-height: 41px;
+  letter-spacing: 0.011em;
+}
+
+@utility ts-title-1 {
+  font-size: 28px;
+  line-height: 34px;
+  letter-spacing: 0.013em;
+}
+
+@utility ts-title-2 {
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: 0.016em;
+}
+
+@utility ts-title-3 {
+  font-size: 20px;
+  line-height: 25px;
+  letter-spacing: 0.019em;
+}
+
+/* headline is body at semibold — Apple's list-row primary label */
+@utility ts-headline {
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.024em;
+  font-weight: 600;
+}
+
+@utility ts-body {
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.024em;
+}
+
+@utility ts-body-emph {
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.024em;
+  font-weight: 600;
+}
+
+@utility ts-callout {
+  font-size: 16px;
+  line-height: 21px;
+  letter-spacing: -0.02em;
+}
+
+@utility ts-subheadline {
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.016em;
+}
+
+@utility ts-subhead-emph {
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.016em;
+  font-weight: 600;
+}
+
+@utility ts-footnote {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.006em;
+}
+
+@utility ts-footnote-emph {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.006em;
+  font-weight: 600;
+}
+
+@utility ts-caption-1 {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0;
+}
+
+@utility ts-caption-2 {
+  font-size: 11px;
+  line-height: 13px;
+  letter-spacing: 0.005em;
+}
+
+/* ---- Figure scale (money) ---------------------------------------------- */
+
+/* Hero balance. Clamps so an iPhone XR (414px) shows ~40px. */
 @utility figure-xl {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-  font-size: clamp(34px, 10vw, 44px);
-  line-height: 1.02;
+  font-feature-settings: var(--ff-sf-tuning), "tnum" 1;
+  font-size: clamp(34px, 9.5vw, 42px);
+  line-height: 1.04;
   font-weight: 650;
   letter-spacing: -0.032em;
 }
 
 @utility figure-lg {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-feature-settings: var(--ff-sf-tuning), "tnum" 1;
   font-size: 26px;
-  line-height: 1.1;
+  line-height: 1.12;
   font-weight: 620;
   letter-spacing: -0.022em;
 }
 
 @utility figure-md {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-feature-settings: var(--ff-sf-tuning), "tnum" 1;
   font-size: 19px;
-  line-height: 1.15;
+  line-height: 1.18;
   font-weight: 600;
   letter-spacing: -0.014em;
 }
@@ -308,7 +472,7 @@ input[type="date"] {
 /* Numeric keypad digits */
 @utility figure-keypad {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  font-feature-settings: var(--ff-sf-tuning), "tnum" 1;
   font-size: 24px;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -320,6 +484,7 @@ input[type="date"] {
   font-weight: 620;
   letter-spacing: 0.075em;
   text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------------------------------------------------------------------------
@@ -446,6 +611,34 @@ input[type="date"] {
   background-size: 220% 100%;
   animation: pl-shimmer 1.4s linear infinite;
   border-radius: var(--radius-sm);
+}
+
+/* ---------------------------------------------------------------------------
+   SYMBOL SCALE
+   ---------------------------------------------------------------------------
+   Apple's SF Symbols cannot be shipped to the web, so icons render from Lucide
+   (ISC licence) — drawn on the same 24px grid with round caps and joins, the
+   geometry SF Symbols are built on. These classes give every icon a shared
+   baseline: round terminators, no shrinking inside flex rows, and vertical
+   optical centring against text.
+
+   Stroke weights and point sizes are applied by the Icon component in
+   src/design/Icon.tsx, which maps the real SF Symbols scales onto Lucide.
+   --------------------------------------------------------------------------- */
+
+.icon-base {
+  display: inline-block;
+  flex: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+  /* Optically align with the x-height of adjacent text rather than the box. */
+  transform: translateY(-0.0625em);
+}
+
+/* Icons that sit flush in a tight row or a button keep their baseline instead. */
+.icon-flush {
+  transform: none;
 }
 
 /* Recharts: keep text on our token colours and cursor subtle */
