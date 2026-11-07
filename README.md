@@ -56,6 +56,40 @@ To create a private GitHub repository, open the VS Code Command Palette, run
 commits. If you already have a repository, use **Git: Add Remote** instead,
 then push the branch. A local bundle itself cannot receive pushes.
 
+#### If commits seem to be missing
+
+Open the project folder itself in VS Code. In **Source Control**, the **Changes**
+list shows only uncommitted edits; existing commits appear in the **Graph** view.
+You can also inspect the repository from its terminal:
+
+```bash
+git status -sb
+git --no-pager log --all --oneline --decorate -40
+git rev-list --count HEAD
+```
+
+The history includes `8451a9b feat(nav): use sidebar on tablets and desktop`.
+The bundle is a snapshot, not a live remote: publishing from your computer does
+not automatically connect this workspace to the same GitHub repository.
+
+To inspect an updated bundle without changing your working files, first download
+it and fetch its branch into `FETCH_HEAD` (replace the filename):
+
+```bash
+git fetch --no-tags "$HOME/Downloads/pocket-ledger-….bundle" refs/heads/master
+git --no-pager log --oneline HEAD..FETCH_HEAD
+```
+
+If `git status` shows a clean working tree and the histories share the same
+ancestry, `git merge --ff-only FETCH_HEAD` updates the current branch. Git refuses
+the fast-forward if it cannot apply safely; it does not discard local work. If
+there are local edits, commit or back them up before merging. Do not force-push
+or reset your branch to recover history.
+
+Git history for this repository began after Pocket Ledger replaced the earlier
+Stash/Next.js prototype; that earlier prototype was not captured as separate
+commits in this repository.
+
 Your financial records live in your browser's IndexedDB; they are **not** part
 of the Git repository. To move them too, use **Settings → Export JSON backup**
 in the old app and **Settings → Restore from backup** in the local app.
