@@ -44,3 +44,9 @@ pnpm-debug.log*
 .cache/
 .vite/
 *.tsbuildinfo
+
+# Generated Git-history exports. Preview exports are deliberately opt-in.
+/pocket-ledger.bundle
+/pocket-ledger.bundle.tmp
+/public/downloads/pocket-ledger-*.bundle
+/public/downloads/pocket-ledger-*.bundle.tmp

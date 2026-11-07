@@ -29,6 +29,50 @@ npm run typecheck    # tsc --noEmit
 The app opens with clearly-labelled sample data so nothing is empty. Remove or
 reset it from **Settings → Sample data**.
 
+### Open the project in VS Code on another machine
+
+If you received a `pocket-ledger-….bundle` file from this workspace, install
+[Git](https://git-scm.com/downloads), [Node.js 22 LTS or newer](https://nodejs.org/)
+and [Visual Studio Code](https://code.visualstudio.com/), then run this in a
+terminal from the folder where you want the project:
+
+```bash
+git clone "$HOME/Downloads/pocket-ledger-….bundle" pocket-ledger
+cd pocket-ledger
+git remote remove origin
+npm ci
+npm run dev
+```
+
+Replace the bundle filename with the one you downloaded. `git clone` restores
+all the commits, not just the latest files. Removing `origin` disconnects the
+read-only bundle file so you can add a real remote. Open the `pocket-ledger`
+folder in VS Code with **File → Open Folder**. The terminal running Vite must
+remain open while you use the app at `http://localhost:5173`.
+
+To create a private GitHub repository, open the VS Code Command Palette, run
+**Publish to GitHub**, sign in if prompted, choose a repository name and select
+**Private**. VS Code creates the repository, adds its remote and pushes the
+commits. If you already have a repository, use **Git: Add Remote** instead,
+then push the branch. A local bundle itself cannot receive pushes.
+
+Your financial records live in your browser's IndexedDB; they are **not** part
+of the Git repository. To move them too, use **Settings → Export JSON backup**
+in the old app and **Settings → Restore from backup** in the local app.
+
+To create another bundle later, commit your changes and run:
+
+```bash
+node scripts/export-git-bundle.mjs
+```
+
+This writes an ignored `pocket-ledger.bundle` in the project root. To make a
+one-off copy downloadable from the app's preview, run the script with
+`--preview` and rebuild the app. The script prints the generated URL path. That
+preview copy exposes the full committed source and history to anyone with its
+link, so share it only with people you trust and remove it when no longer needed.
+No credentials or browser data are included unless they were committed to Git.
+
 ---
 
 ## Design system
