@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Check,
   Cloud,
@@ -92,6 +92,28 @@ export function SettingsScreen({
 
   const sync = describeSync();
 
+  /* =========================================================================
+     Drive auth effects
+     ========================================================================= */
+
+  // On mount: clear any stuck busy state, show OAuth errors from the URL,
+  // and load Drive backups if already authenticated.
+  useEffect(() => {
+    setDriveBusy(null);
+
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    if (error) {
+      toast("Connection failed", { tone: "error", detail: error });
+      // Clean the URL so a refresh doesn't re-show the error.
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
+    if (isAuthenticated() && driveAdapter.available) {
+      void loadDriveBackups();
+    }
+  }, []);
+
   const toggleCurrency = (code: string) => {
     if (code === reportingCurrency) return; // always keep the reporting currency enabled
     const next = enabledCurrencies.includes(code)
@@ -137,19 +159,15 @@ export function SettingsScreen({
   const handleConnectDrive = async () => {
     setDriveBusy("Connecting");
     try {
-      const session = await driveAdapter.connect();
-      toast("Google Drive connected", {
-        tone: "success",
-        detail: session.accountLabel,
-      });
-      await loadDriveBackups();
+      await driveAdapter.connect();
+      // requestCode() performs a full-page redirect; this line is only
+      // reached if the redirect somehow did not happen.
     } catch (error) {
+      setDriveBusy(null);
       toast("Connection failed", {
         tone: "error",
         detail: error instanceof Error ? error.message : undefined,
       });
-    } finally {
-      setDriveBusy(null);
     }
   };
 
