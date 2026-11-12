@@ -96,6 +96,20 @@ export function parseBackup(text: string): CodecResult {
   }
 
   // Validate the shape of each table before anything is written.
+  // Tables keyed by `id` (accounts, transactions, categories, budgets, goals,
+  // goalContributions, recurring) require `id` on every row. Tables keyed by
+  // `key` (preferences, syncMetadata) require `key` instead.
+  const idKeyedTables = new Set([
+    "accounts",
+    "transactions",
+    "categories",
+    "budgets",
+    "goals",
+    "goalContributions",
+    "recurring",
+  ]);
+  const keyKeyedTables = new Set(["preferences", "syncMetadata"]);
+
   for (const name of TABLE_NAMES) {
     const rows = (candidate.records as Record<string, unknown>)[name];
     if (rows === undefined) continue;
@@ -103,8 +117,15 @@ export function parseBackup(text: string): CodecResult {
       return { ok: false, error: `The "${name}" section of this backup is malformed.` };
     }
     for (const row of rows) {
-      if (typeof row !== "object" || row === null || !("id" in row)) {
-        return { ok: false, error: `A record in "${name}" is missing its identifier.` };
+      if (typeof row !== "object" || row === null) {
+        return { ok: false, error: `A record in "${name}" is malformed.` };
+      }
+      const requiredKey = idKeyedTables.has(name) ? "id" : keyKeyedTables.has(name) ? "key" : null;
+      if (requiredKey && !(requiredKey in row)) {
+        return {
+          ok: false,
+          error: `A record in "${name}" is missing its "${requiredKey}" identifier.`,
+        };
       }
     }
   }

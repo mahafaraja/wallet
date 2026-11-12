@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pocket Ledger — Sign in with Google</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var hash = window.location.hash || "";
+        var params = new URLSearchParams(hash.replace(/^#/, ""));
+        var token = params.get("access_token");
+        var error = params.get("error");
+
+        if (window.opener) {
+          if (error) {
+            window.opener.postMessage(
+              { type: "google-drive-oauth", error: error },
+              window.location.origin
+            );
+          } else if (token) {
+            window.opener.postMessage(
+              { type: "google-drive-oauth", token: token },
+              window.location.origin
+            );
+          } else {
+            window.opener.postMessage(
+              { type: "google-drive-oauth", error: "no_token" },
+              window.location.origin
+            );
+          }
+        }
+
+        window.close();
+      })();
+    </script>
+  </body>
+</html>

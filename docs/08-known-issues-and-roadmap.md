@@ -41,7 +41,7 @@ This is an **as-implemented assessment**, not a list of completed features. It w
 | **Dexie boundary** | The repository is not the only database access point: app composition, preference hooks, quick-add, seed and backup codec also use `db`. | Consolidate reads/writes behind a documented interface; preserve reactive updates. |
 | **Index use / scale** | Some list operations load whole tables and filter in memory despite available indexes. | Query indexed ranges where useful; measure performance with large datasets. |
 | **Testing** | Unit tests cover useful money/finance and navigation cases, not comprehensive IndexedDB, backup, offline, accessibility or real-device flows. | Add database integration, browser end-to-end, import round-trip, cross-currency and migration tests. |
-| **Authentication / Drive** | No login or cloud sync is implemented. The Google Drive adapter deliberately reports not connected. | Design authentication separately from Drive authorization; implement least-privilege access only after backup integrity is established. |
+| **Authentication / Drive** | Google Drive backup is implemented via OAuth 2.0 (`drive.file` scope). Requires `VITE_GOOGLE_DRIVE_CLIENT_ID` in `.env`. No app-level login — Drive authorization grants access only to backup files this app created. | Add automated import round-trip tests for Drive backups; consider background auto-backup. |
 
 ## Suggested order of work
 
@@ -49,6 +49,6 @@ This is an **as-implemented assessment**, not a list of completed features. It w
 2. **Protect financial calculations:** block or correctly model cross-currency transfers; fix mixed-currency aggregates, goal withdrawal limits, rounding and precision validation.
 3. **Make the current product coherent:** finish account/goal editing, custom categories, recurring management, privacy masking and settings rates.
 4. **Prove offline and migration behavior:** automated browser tests, schema upgrades, cache versioning, failure/recovery paths and device testing.
-5. **Add identity and cloud sync later:** separately designed authentication and Drive authorization, user-visible backup files, deletion handling and conflict resolution.
+5. **Add Drive backup tests:** automated import round-trip tests for Drive backups; consider background auto-backup.
 
 For each fix, add tests that reproduce the previous failure and verify that existing user records are preserved. Update the corresponding documentation when behavior changes.

@@ -1,15 +1,15 @@
 import { useRef, useState } from "react";
 import {
   Check,
-  Download,
-  Upload,
   Cloud,
   CloudOff,
+  Download,
+  RefreshCw,
   Sun,
   Moon,
   MonitorSmartphone,
-  RefreshCw,
   Trash2,
+  Upload,
   Info,
   Coins,
   ShieldCheck,
@@ -32,7 +32,19 @@ import { useToast } from "@/components/ui/feedback";
 import type { ThemePreference } from "@/state/settings";
 import { clearDemoData, seedDemoData } from "@/data/seed";
 import { clearAllData } from "@/data/repository";
-import { describeSync, exportToFile, mergeBackup, planRestore, restoreBackup } from "@/data/sync/syncManager";
+import type { BackupManifest } from "@/data/sync/adapter";
+import { detectConflict } from "@/data/sync/adapter";
+import type { BackupPayload } from "@/data/sync/syncManager";
+import {
+  describeSync,
+  exportToFile,
+  mergeBackup,
+  planRestore,
+  restoreBackup,
+  driveAdapter,
+} from "@/data/sync/syncManager";
+import { buildBackup } from "@/data/sync/backupCodec";
+import { isAuthenticated } from "@/data/sync/driveAuth";
 import { CATALOGUE_ORDER, currency } from "@/lib/currency";
 import { formatMoney } from "@/lib/currency";
 import { parseAmountToMinor } from "@/lib/money";
@@ -75,6 +87,8 @@ export function SettingsScreen({
 
   const [pendingRestore, setPendingRestore] = useState<PendingRestore | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [driveBackups, setDriveBackups] = useState<BackupManifest[]>([]);
+  const [driveBusy, setDriveBusy] = useState<string | null>(null);
 
   const sync = describeSync();
 
@@ -101,6 +115,130 @@ export function SettingsScreen({
       });
     } catch (error) {
       toast("Could not read that file", { tone: "error", detail: error instanceof Error ? error.message : undefined });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  /* =========================================================================
+     Google Drive handlers
+     ========================================================================= */
+
+  const loadDriveBackups = async () => {
+    try {
+      const backups = await driveAdapter.listBackups();
+      setDriveBackups(backups);
+    } catch {
+      // If listing fails (e.g. not connected), keep the list empty.
+      setDriveBackups([]);
+    }
+  };
+
+  const handleConnectDrive = async () => {
+    setDriveBusy("Connecting");
+    try {
+      const session = await driveAdapter.connect();
+      toast("Google Drive connected", {
+        tone: "success",
+        detail: session.accountLabel,
+      });
+      await loadDriveBackups();
+    } catch (error) {
+      toast("Connection failed", {
+        tone: "error",
+        detail: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setDriveBusy(null);
+    }
+  };
+
+  const handleDisconnectDrive = async () => {
+    setDriveBusy("Disconnecting");
+    try {
+      await driveAdapter.disconnect();
+      setDriveBackups([]);
+      toast("Google Drive disconnected");
+    } catch (error) {
+      toast("Disconnect failed", {
+        tone: "error",
+        detail: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setDriveBusy(null);
+    }
+  };
+
+  const handleBackupToDrive = async () => {
+    setDriveBusy("Backing up");
+    try {
+      const localPayload = await buildBackup();
+      const records = localPayload.records;
+      const manifest = await driveAdapter.upload(records);
+      await loadDriveBackups();
+      toast("Backup saved to Drive", {
+        tone: "success",
+        detail: manifest.label,
+      });
+    } catch (error) {
+      toast("Backup to Drive failed", {
+        tone: "error",
+        detail: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setDriveBusy(null);
+    }
+  };
+
+  const handleRestoreFromDrive = async (manifest: BackupManifest) => {
+    setBusy("Restoring from Drive");
+    try {
+      const records = await driveAdapter.download(manifest.id);
+      const localPayload = await buildBackup();
+      const conflict = detectConflict(
+        {
+          records: localPayload.records,
+          revision: localPayload.revision,
+          changedAt: localPayload.createdAt,
+        },
+        {
+          records,
+          revision: manifest.revision ?? 0,
+          changedAt: manifest.createdAt,
+        },
+      );
+
+      if (conflict.localOnly.length === 0 && conflict.diverged.length === 0) {
+        await restoreBackup({
+          app: "pocket-ledger",
+          schemaVersion: 1,
+          createdAt: manifest.createdAt,
+          revision: manifest.revision ?? 0,
+          counts: {},
+          records,
+        });
+        toast("Backup restored from Drive", { tone: "success" });
+      } else {
+        const payload: BackupPayload = {
+          app: "pocket-ledger",
+          schemaVersion: 1,
+          createdAt: manifest.createdAt,
+          revision: manifest.revision ?? 0,
+          counts: {},
+          records,
+        };
+        await mergeBackup(payload);
+        toast("Backup merged from Drive", {
+          tone: "success",
+          detail: "No records were discarded.",
+        });
+      }
+      await loadDriveBackups();
+    } catch (error) {
+      toast("Restore from Drive failed", {
+        tone: "error",
+        detail: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setBusy(null);
     }
@@ -302,56 +440,144 @@ export function SettingsScreen({
             />
           </section>
 
-          {/* ---- Cloud sync (planned, not connected) --------------------- */}
+          {/* ---- Cloud sync (Google Drive) --------------------------------- */}
           <section>
-            <SectionHeader title="Cloud synchronisation" hint="Planned for a future version" />
+            <SectionHeader title="Cloud synchronisation" hint="Google Drive backup" />
             <Card className="!p-3.5">
+              {/* Status row */}
               <div className="flex items-start gap-3">
-                <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-3">
-                  <CloudOff size={17} strokeWidth={2} />
+                <span
+                  aria-hidden
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-[10px] ${
+                    driveAdapter.available ? "bg-surface-2" : "bg-danger-wash"
+                  } text-ink-3`}
+                >
+                  {driveAdapter.available ? (
+                    <Cloud size={17} strokeWidth={2} />
+                  ) : (
+                    <CloudOff size={17} strokeWidth={2} />
+                  )}
                 </span>
                 <div className="min-w-0">
                   <p className="flex items-center gap-2 ts-callout font-semibold">
                     Google Drive
-                    <span className="rounded-full bg-surface-2 px-2 py-0.5 ts-caption-2 font-semibold text-ink-3">
-                      Not connected
-                    </span>
+                    {!driveAdapter.available ? (
+                      <span className="rounded-full bg-surface-2 px-2 py-0.5 ts-caption-2 font-semibold text-ink-3">
+                        Not configured
+                      </span>
+                    ) : isAuthenticated() ? (
+                      <span className="rounded-full bg-accent-wash px-2 py-0.5 ts-caption-2 font-semibold text-accent">
+                        Connected
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-surface-2 px-2 py-0.5 ts-caption-2 font-semibold text-ink-3">
+                        Not connected
+                      </span>
+                    )}
                   </p>
-                  <p className="mt-1 ts-footnote leading-snug text-ink-3">{sync.cloud.detail}</p>
+                  <p className="mt-1 ts-footnote leading-snug text-ink-3">
+                    {!driveAdapter.available
+                      ? "Add VITE_GOOGLE_DRIVE_CLIENT_ID to .env to enable Google Drive."
+                      : isAuthenticated()
+                        ? "Backups live in your Google Drive. Back up or restore across devices."
+                        : "Sign in to Google Drive to enable cloud backup."}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-3.5 space-y-2 rounded-sm bg-surface-2 px-3 py-3 ts-caption-1 text-ink-2">
-                <p className="flex items-start gap-2">
-                  <Cloud size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
-                  Backups will live in a visible Drive folder named{" "}
-                  <strong className="font-semibold text-ink">{sync.cloud.plannedFolder}</strong>, so you can always reach
-                  them yourself.
-                </p>
-                <p className="flex items-start gap-2">
-                  <ShieldCheck size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
-                  The narrow <code className="font-mono text-[11px]">{sync.cloud.scope}</code> permission will be
-                  requested — access limited to files this app creates.
-                </p>
-                <p className="flex items-start gap-2">
-                  <Coins size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
-                  Versioned JSON, with timestamps and conflict prompts. Nothing is ever silently overwritten or deleted.
+              {/* Action buttons */}
+              <div className="mt-3.5 space-y-2">
+                {!driveAdapter.available ? (
+                  <Button variant="secondary" size="sm" full disabled>
+                    Configure Google Drive
+                  </Button>
+                ) : isAuthenticated() ? (
+                  <>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      full
+                      disabled={driveBusy !== null}
+                      onClick={handleBackupToDrive}
+                    >
+                      {driveBusy === "Backing up" ? "Backing up…" : "Back up to Drive now"}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      full
+                      disabled={driveBusy !== null}
+                      onClick={handleDisconnectDrive}
+                    >
+                      {driveBusy === "Disconnecting" ? "Disconnecting…" : "Disconnect Google Drive"}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    full
+                    disabled={driveBusy !== null}
+                    onClick={handleConnectDrive}
+                  >
+                    {driveBusy === "Connecting" ? "Connecting…" : "Connect Google Drive"}
+                  </Button>
+                )}
+                <p className="text-center ts-caption-1 text-ink-3">
+                  {driveAdapter.available
+                    ? isAuthenticated()
+                      ? "Backups are versioned JSON in your Drive folder — nothing is silently overwritten."
+                      : "Connect to enable cloud backup across your devices."
+                    : "Set VITE_GOOGLE_DRIVE_CLIENT_ID in .env and restart the dev server."}
                 </p>
               </div>
 
-              <Button
-                variant="secondary"
-                size="md"
-                full
-                className="mt-3"
-                disabled
-                aria-describedby="cloud-disabled"
-              >
-                Connect Google Drive
-              </Button>
-              <p id="cloud-disabled" className="mt-1.5 text-center ts-caption-1 text-ink-3">
-                Switched on in a later version. Not part of this build.
-              </p>
+              {/* Drive backup list */}
+              {isAuthenticated() && driveBackups.length > 0 && (
+                <div className="mt-4">
+                  <p className="mb-2 ts-caption-1 font-semibold text-ink-2">
+                    Backups in Drive
+                  </p>
+                  <ListGroup>
+                    {driveBackups.map((m) => (
+                      <ListRow key={m.id} onClick={() => void handleRestoreFromDrive(m)}>
+                        <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface-2 text-ink-2">
+                          <Cloud size={15} strokeWidth={2} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block ts-subheadline font-medium">{m.label}</span>
+                          <span className="block ts-caption-1 text-ink-3">
+                            {new Date(m.createdAt).toLocaleString()} ·{" "}
+                            {m.sizeBytes ? (m.sizeBytes / 1024).toFixed(1) + " KB" : "unknown size"}
+                          </span>
+                        </span>
+                        <span className="text-ink-3 ts-caption-1">Restore</span>
+                      </ListRow>
+                    ))}
+                  </ListGroup>
+                </div>
+              )}
+
+              {/* Info details (shown when not yet connected) */}
+              {!isAuthenticated() && driveAdapter.available && (
+                <div className="mt-3.5 space-y-2 rounded-sm bg-surface-2 px-3 py-3 ts-caption-1 text-ink-2">
+                  <p className="flex items-start gap-2">
+                    <Cloud size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
+                    Backups will live in a visible Drive folder named{" "}
+                    <strong className="font-semibold text-ink">{sync.cloud.plannedFolder}</strong>, so you can always reach
+                    them yourself.
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <ShieldCheck size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
+                    The narrow <code className="font-mono text-[11px]">{sync.cloud.scope}</code> permission will be
+                    requested — access limited to files this app creates.
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <Coins size={13} strokeWidth={2.2} className="mt-0.5 shrink-0 text-ink-3" />
+                    Versioned JSON, with timestamps and conflict prompts. Nothing is ever silently overwritten or deleted.
+                  </p>
+                </div>
+              )}
             </Card>
           </section>
 
