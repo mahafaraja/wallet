@@ -122,27 +122,42 @@ export function isAuthenticated(): boolean {
   return accessToken !== null && Date.now() < expiresAt;
 }
 
-/** The Google Identity Services code client, initialized once GIS loads. */
-let codeClient: any = null;
+/** The Google Identity Services token client, initialized once GIS loads. */
+let tokenClient: any = null;
 
-/** Initialize the GIS code client (called after the GIS script loads). */
-function initCodeClient(): void {
-  if (codeClient || !window.google?.accounts?.oauth2) return;
-  codeClient = window.google.accounts.oauth2.initCodeClient({
+/** Settlers for the in-flight token request (popup flow). */
+let tokenRequestResolve: ((token: string) => void) | null = null;
+let tokenRequestReject: ((error: Error) => void) | null = null;
+
+/** Initialize the GIS token client (called after the GIS script loads). */
+function initTokenClient(): void {
+  if (tokenClient || !window.google?.accounts?.oauth2) return;
+  tokenClient = window.google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID!,
     scope: DRIVE_SCOPE,
-    ux_mode: "redirect",
-    redirect_uri: REDIRECT_URI,
-    state: "pocket-ledger",
+    callback: (response: any) => {
+      const resolve = tokenRequestResolve;
+      const reject = tokenRequestReject;
+      tokenRequestResolve = null;
+      tokenRequestReject = null;
+
+      if (response.error) {
+        reject?.(new Error(`Google authorization failed: ${response.error}`));
+      } else if (response.access_token) {
+        resolve?.(response.access_token);
+      } else {
+        reject?.(new Error("No access token returned from Google."));
+      }
+    },
   });
 }
 
-/** Wait for the GIS library to load, then initialize the code client. */
-function ensureCodeClient(): Promise<void> {
+/** Wait for the GIS library to load, then initialize the token client. */
+function ensureTokenClient(): Promise<void> {
   return new Promise((resolve) => {
     const check = () => {
       if (window.google?.accounts?.oauth2) {
-        initCodeClient();
+        initTokenClient();
         resolve();
       } else {
         setTimeout(check, 100);
@@ -153,14 +168,11 @@ function ensureCodeClient(): Promise<void> {
 }
 
 /**
- * Connect to Google Drive using the Authorization Code flow.
+ * Connect to Google Drive using the token client (popup flow).
  *
- * Calls `client.requestCode()`, which redirects the browser to Google's
- * consent screen. After the user grants access, Google redirects back to
- * `oauth-callback.html?code=...`, which exchanges the code for tokens and
- * redirects back to the app.
- *
- * This function does not resolve normally — the page navigates away.
+ * Opens a Google consent popup. After the user grants access, Google calls
+ * back with an access token directly — no redirect, no code exchange, no CORS.
+ * The page never navigates away, so the UI stays intact.
  */
 export async function connectDrive(): Promise<{ accountLabel: string; accessToken: string }> {
   if (!isConfigured()) {
@@ -169,64 +181,31 @@ export async function connectDrive(): Promise<{ accountLabel: string; accessToke
     );
   }
 
-  await ensureCodeClient();
-  const client = codeClient;
+  await ensureTokenClient();
+  const client = tokenClient;
   if (!client) {
     throw new Error("Google Identity Services client could not be initialized.");
   }
 
-  // Store client_id so oauth-callback.html can read it after the redirect.
-  localStorage.setItem("pocket-ledger-drive-client-id", CLIENT_ID!);
+  const token = await new Promise<string>((resolve, reject) => {
+    tokenRequestResolve = resolve;
+    tokenRequestReject = reject;
 
-  // requestCode() performs a full-page redirect; execution never continues here.
-  client.requestCode();
-
-  // Unreachable, but TypeScript needs a return:
-  throw new Error("OAuth flow did not complete as expected.");
-}
-
-/**
- * Exchange an authorization code for access + refresh tokens.
- * Called by oauth-callback.html after Google redirects back with ?code=...
- */
-export async function exchangeCodeForTokens(
-  code: string,
-): Promise<{ access_token: string; refresh_token?: string; expires_in: number }> {
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      code,
-      client_id: CLIENT_ID!,
-      redirect_uri: REDIRECT_URI,
-      grant_type: "authorization_code",
-    }),
+    client.requestAccessToken({
+      prompt: "consent",
+    });
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Token exchange failed: ${res.status} ${text}`);
-  }
-
-  return (await res.json()) as {
-    access_token: string;
-    refresh_token?: string;
-    expires_in: number;
+  persistTokens({ access_token: token, expires_in: 3600 });
+  return {
+    accountLabel: "Google Account",
+    accessToken: token,
   };
 }
 
 /** Disconnect: clear all stored tokens. */
 export async function disconnectDrive(): Promise<void> {
   clearStoredTokens();
-  if (window.google?.accounts?.oauth2 && accessToken) {
-    try {
-      await new Promise<void>((resolve) => {
-        window.google.accounts.oauth2.revoke(accessToken, () => resolve());
-      });
-    } catch {
-      /* revocation failure is not fatal */
-    }
-  }
 }
 
 /* -------------------------------------------------------------------------- */

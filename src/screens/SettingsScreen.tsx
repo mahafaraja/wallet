@@ -96,18 +96,10 @@ export function SettingsScreen({
      Drive auth effects
      ========================================================================= */
 
-  // On mount: clear any stuck busy state, show OAuth errors from the URL,
-  // and load Drive backups if already authenticated.
+  // On mount: clear any stuck busy state and load Drive backups if already
+  // authenticated (e.g. after a page reload with a stored token).
   useEffect(() => {
     setDriveBusy(null);
-
-    const params = new URLSearchParams(window.location.search);
-    const error = params.get("error");
-    if (error) {
-      toast("Connection failed", { tone: "error", detail: error });
-      // Clean the URL so a refresh doesn't re-show the error.
-      window.history.replaceState({}, "", window.location.pathname);
-    }
 
     if (isAuthenticated() && driveAdapter.available) {
       void loadDriveBackups();
@@ -159,9 +151,12 @@ export function SettingsScreen({
   const handleConnectDrive = async () => {
     setDriveBusy("Connecting");
     try {
-      await driveAdapter.connect();
-      // requestCode() performs a full-page redirect; this line is only
-      // reached if the redirect somehow did not happen.
+      const session = await driveAdapter.connect();
+      toast("Google Drive connected", {
+        tone: "success",
+        detail: session.accountLabel,
+      });
+      await loadDriveBackups();
     } catch (error) {
       setDriveBusy(null);
       toast("Connection failed", {
