@@ -1,6 +1,6 @@
 # Pocket Ledger documentation
 
-This guide describes the **current Pocket Ledger implementation**, including what is available, how its parts connect, and what still needs work. It is meant for both the person using the app and someone maintaining it in VS Code.
+This guide describes the **current Pocket Ledger implementation**, including what is available, how its parts connect, and what still needs work. It is meant for both the person using the app and someone maintaining the code.
 
 > **Important:** This is an early version, not a complete or independently audited financial system. The current backup importer can reject its own exported files, and some multi-currency paths can produce incorrect figures. Do not rely on the app as the only copy of important financial records. Read [Known issues and roadmap](08-known-issues-and-roadmap.md) before using real data.
 
