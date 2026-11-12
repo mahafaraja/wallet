@@ -35,8 +35,6 @@ export const REDIRECT_URI =
   import.meta.env.VITE_GOOGLE_DRIVE_REDIRECT_URI ??
   `${window.location.protocol}//${window.location.host}/oauth-callback`;
 
-const AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
-const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3";
 
@@ -110,6 +108,12 @@ function clearStoredTokens(): void {
 /*  OAuth                                                                     */
 /* -------------------------------------------------------------------------- */
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 export function isConfigured(): boolean {
   return Boolean(CLIENT_ID && CLIENT_ID.trim().length > 0);
 }
@@ -118,110 +122,111 @@ export function isAuthenticated(): boolean {
   return accessToken !== null && Date.now() < expiresAt;
 }
 
+/** The Google Identity Services code client, initialized once GIS loads. */
+let codeClient: any = null;
+
+/** Initialize the GIS code client (called after the GIS script loads). */
+function initCodeClient(): void {
+  if (codeClient || !window.google?.accounts?.oauth2) return;
+  codeClient = window.google.accounts.oauth2.initCodeClient({
+    client_id: CLIENT_ID!,
+    scope: DRIVE_SCOPE,
+    ux_mode: "redirect",
+    redirect_uri: REDIRECT_URI,
+    state: "pocket-ledger",
+  });
+}
+
+/** Wait for the GIS library to load, then initialize the code client. */
+function ensureCodeClient(): Promise<void> {
+  return new Promise((resolve) => {
+    const check = () => {
+      if (window.google?.accounts?.oauth2) {
+        initCodeClient();
+        resolve();
+      } else {
+        setTimeout(check, 100);
+      }
+    };
+    check();
+  });
+}
+
 /**
- * Start the OAuth flow in a popup. Resolves with the access token when the
- * user grants permission, or rejects if they cancel or an error occurs.
+ * Connect to Google Drive using the Authorization Code flow.
+ *
+ * Calls `client.requestCode()`, which redirects the browser to Google's
+ * consent screen. After the user grants access, Google redirects back to
+ * `oauth-callback.html?code=...`, which exchanges the code for tokens and
+ * redirects back to the app.
+ *
+ * This function does not resolve normally — the page navigates away.
  */
-async function authorizePopup(): Promise<string> {
+export async function connectDrive(): Promise<{ accountLabel: string; accessToken: string }> {
   if (!isConfigured()) {
     throw new Error(
       "Google Drive is not configured. Set VITE_GOOGLE_DRIVE_CLIENT_ID (and optionally VITE_GOOGLE_DRIVE_REDIRECT_URI) in .env.",
     );
   }
 
-  const params = new URLSearchParams({
-    client_id: CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    scope: DRIVE_SCOPE,
-    response_type: "token",
-    include_granted_scopes: "true",
-    prompt: "consent",
-    access_type: "offline",
-  });
-
-  const authUrl = `${AUTH_ENDPOINT}?${params.toString()}`;
-  const popup = window.open(authUrl, "google-drive-oauth", "width=500,height=660,menubar=no,toolbar=no");
-
-  if (!popup) {
-    throw new Error("Could not open the sign-in popup. Please allow popups for this site.");
+  await ensureCodeClient();
+  const client = codeClient;
+  if (!client) {
+    throw new Error("Google Identity Services client could not be initialized.");
   }
 
-  return new Promise((resolve, reject) => {
-    const checkInterval = setInterval(() => {
-      try {
-        if (popup.closed) {
-          clearInterval(checkInterval);
-          reject(new Error("Sign-in popup was closed."));
-          return;
-        }
+  // Store client_id so oauth-callback.html can read it after the redirect.
+  localStorage.setItem("pocket-ledger-drive-client-id", CLIENT_ID!);
 
-        const href = popup.location.href;
-        if (href.startsWith(REDIRECT_URI) || href.includes(`${REDIRECT_URI}#`)) {
-          clearInterval(checkInterval);
-          const hash = new URL(href).hash;
-          if (hash) {
-            const params = new URLSearchParams(hash.replace(/^#/, ""));
-            const token = params.get("access_token");
-            const error = params.get("error");
-            popup.close();
-            if (error) {
-              reject(new Error(`Google authorization failed: ${error}`));
-            } else if (token) {
-              resolve(token);
-            } else {
-              reject(new Error("No access token returned from Google."));
-            }
-          } else {
-            popup.close();
-            reject(new Error("Google redirected without a token."));
-          }
-        }
-      } catch {
-        // Cross-origin access to popup.location may throw before the redirect;
-        // keep polling until the redirect happens.
-      }
-    }, 200);
+  // requestCode() performs a full-page redirect; execution never continues here.
+  client.requestCode();
 
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      try {
-        popup.close();
-      } catch {
-        /* ignore */
-      }
-      reject(new Error("Sign-in timed out."));
-    }, 300_000);
-  });
+  // Unreachable, but TypeScript needs a return:
+  throw new Error("OAuth flow did not complete as expected.");
 }
 
 /**
- * Connect to Google Drive. Runs the OAuth flow, stores tokens, and returns
- * a sync session describing the connected account.
+ * Exchange an authorization code for access + refresh tokens.
+ * Called by oauth-callback.html after Google redirects back with ?code=...
  */
-export async function connectDrive(): Promise<{ accountLabel: string; accessToken: string }> {
-  const token = await authorizePopup();
-  const profile = await getUserProfile(token);
-  persistTokens({ access_token: token, expires_in: 3600 });
-  return {
-    accountLabel: profile.email ?? "Google Account",
-    accessToken: token,
+export async function exchangeCodeForTokens(
+  code: string,
+): Promise<{ access_token: string; refresh_token?: string; expires_in: number }> {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: CLIENT_ID!,
+      redirect_uri: REDIRECT_URI,
+      grant_type: "authorization_code",
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Token exchange failed: ${res.status} ${text}`);
+  }
+
+  return (await res.json()) as {
+    access_token: string;
+    refresh_token?: string;
+    expires_in: number;
   };
 }
 
-/**
- * Disconnect: clear all stored tokens.
- */
+/** Disconnect: clear all stored tokens. */
 export async function disconnectDrive(): Promise<void> {
   clearStoredTokens();
-}
-
-/** Fetch the user's profile from Google's OAuth2 API. */
-async function getUserProfile(token: string): Promise<{ email?: string }> {
-  const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return {};
-  return (await res.json()) as { email?: string };
+  if (window.google?.accounts?.oauth2 && accessToken) {
+    try {
+      await new Promise<void>((resolve) => {
+        window.google.accounts.oauth2.revoke(accessToken, () => resolve());
+      });
+    } catch {
+      /* revocation failure is not fatal */
+    }
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -237,7 +242,7 @@ export async function getValidAccessToken(): Promise<string> {
     throw new Error("No refresh token available. Please reconnect Google Drive.");
   }
 
-  const res = await fetch(TOKEN_ENDPOINT, {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
