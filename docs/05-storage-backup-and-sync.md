@@ -11,7 +11,7 @@
 | **Git bundle / GitHub repo** | Committed source code and Git history | Financial records stored in the browser; uncommitted/ignored files |
 | **Service-worker cache** | Cached application resources | A usable financial-data backup |
 
-Google Drive synchronization and authentication are **not connected** in this version.
+Google Drive synchronization is **available** in this version. Connect your Google account in Settings to back up to a visible "Personal Finance Backups" folder in your own Drive. The narrow `drive.file` OAuth scope means the app can only see files it created — nothing else in your Drive is reachable.
 
 ## Local IndexedDB
 
@@ -61,9 +61,9 @@ Additional implementation limitations:
 
 Do not change financial records manually inside an exported JSON file as a workaround. Future work should add round-trip tests, schema validation by store, transactional import, correct keyed-table handling, explicit merge/replace behavior, and a recovery strategy before presenting restore as reliable.
 
-## Sync architecture: intended future direction
+## Sync architecture
 
-The code sketches a future, user-owned Google Drive backup:
+Google Drive backup is implemented through the `SyncAdapter` interface:
 
 ```text
 IndexedDB working copy
@@ -75,23 +75,32 @@ SyncAdapter interface
 Google Drive adapter → visible “Personal Finance Backups” folder
 ```
 
-Relevant modules:
-
-| File | Current role |
+| File | Role |
 | --- | --- |
-| `src/data/sync/adapter.ts` | `SyncAdapter` interface, status/manifest types, preliminary conflict and merge functions |
-| `src/data/sync/adapters.ts` | `DriveSyncAdapter` stub and a `LocalFileSyncAdapter` placeholder |
+| `src/data/sync/adapter.ts` | `SyncAdapter` interface, status/manifest types, conflict and merge functions |
+| `src/data/sync/adapters.ts` | `DriveSyncAdapter` (live Google Drive implementation) and `LocalFileSyncAdapter` |
 | `src/data/sync/backupCodec.ts` | Versioned JSON encode/decode and table collection |
-| `src/data/sync/syncManager.ts` | Direct local-file export plus restore planning/orchestration |
+| `src/data/sync/driveAuth.ts` | Google OAuth 2.0 token management + Drive REST API v3 client |
+| `src/data/sync/syncManager.ts` | Local-file export plus restore planning/orchestration |
 | `src/data/repository.ts` | `replaceAll()` and sync-metadata operations |
 
-The local file export is implemented **directly by `syncManager.ts`**. Although a `LocalFileSyncAdapter` exists, its `upload()` and `download()` methods still throw `NotConnectedError`; it is not currently the working path for JSON export/import.
+The local file export is implemented by `syncManager.ts` (`exportToFile()`). The Drive adapter implements the same `SyncAdapter` interface, so both destinations are interchangeable from the UI's perspective.
 
-`DriveSyncAdapter.available` is `false`. Its connect, list, download and upload methods throw rather than faking a connection. The intended future OAuth permission is `https://www.googleapis.com/auth/drive.file`, subject to the eventual file-picker and folder workflow. The intended folder is visible in Drive rather than relying only on hidden `appDataFolder` storage. These are design intentions, not implemented guarantees.
+`DriveSyncAdapter.available` is `true` when `VITE_GOOGLE_DRIVE_CLIENT_ID` is set in `.env`. Its `connect()`, `listBackups()`, `download()`, and `upload()` methods use the Google Drive REST API v3 with the narrow `drive.file` OAuth scope.
 
-## Authentication is a separate future concern
+### Google Drive setup
 
-Application login would establish who the user is. Google Drive authorization would grant a particular app access to selected/app-created files. They are related, but they are not interchangeable. Neither is implemented here. There is no sign-in flow, token management, remote upload, background sync, or remote conflict resolution in the current product.
+1. Create a Google Cloud Console project and enable the Google Drive API.
+2. Create an OAuth 2.0 client ID (Web application).
+3. Add your redirect URI (e.g. `http://localhost:5173/oauth-callback` for dev).
+4. Copy the client ID into `.env` as `VITE_GOOGLE_DRIVE_CLIENT_ID`.
+5. Run `npm run dev` and connect in Settings.
+
+See `.env.example` for the required variables.
+
+### Authentication through Google OAuth
+
+Application login is separate from Google Drive authorization. The app uses Google OAuth 2.0 with the `drive.file` scope to obtain an access token. Tokens are stored in localStorage and refreshed automatically. No app-level login is required — Drive authorization grants access only to backup files this app created.
 
 ## Before moving between devices
 
